@@ -1,5 +1,5 @@
 ################################################################################
- # Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All Rights Reserved.
+ # Copyright (C) Maxim Integrated Products, Inc., All Rights Reserved.
  #
  # Permission is hereby granted, free of charge, to any person obtaining a
  # copy of this software and associated documentation files (the "Software"),
@@ -32,23 +32,15 @@
  #
  ###############################################################################
 
-# Command-line option for overriding output filename. 
-# Ex: make all OUTFILE="filename" ... results in filename.elf
-ifneq "$(OUTFILE)" ""
-PROJECT=$(OUTFILE)
-endif
-
-# Default name of the build output file
+# This is the name of the build output file
 ifeq "$(PROJECT)" ""
-PROJECT=faceid
+PROJECT=max78000
 endif
 
 # Specify the target processor
 ifeq "$(TARGET)" ""
 TARGET=MAX78000
 endif
-
-MAKE=make
 
 # Create Target name variables
 TARGET_UC:=$(shell echo $(TARGET) | tr a-z A-Z)
@@ -60,17 +52,14 @@ COMPILER=GCC
 # Specify the board used
 ifeq "$(BOARD)" ""
 BOARD=EvKit_V1
+#BOARD=FTHR_RevA
 endif
 
 # This is the path to the CMSIS root directory
 ifeq "$(MAXIM_PATH)" ""
 LIBS_DIR=../../../../Libraries
 else
-ifeq ($(OS),Windows_NT)
 LIBS_DIR=/$(subst \,/,$(subst :,,$(MAXIM_PATH))/Libraries)
-else
-LIBS_DIR=$(subst \,/,$(subst :,,$(MAXIM_PATH))/Libraries)
-endif
 endif
 CMSIS_ROOT=$(LIBS_DIR)/CMSIS
 
@@ -80,17 +69,32 @@ export CMSIS_ROOT
 # LINKERFILE=$(CMSIS_ROOT)/Device/Maxim/$(TARGET_UC)/Source/GCC/max78000_arm.ld
 
 # Source files for this test (add path to VPATH below)
-SRCS  = main.c cnn.c
-SRCS += softmax.c
+SRCS  = main.c 
+SRCS += cnn.c
 
 # Where to find source files for this test
 VPATH  = .
+ifeq "$(MAXIM_PATH)" ""
+VPATH += ../Common/
+else
+VPATH += /$(subst \,/,$(subst :,,$(MAXIM_PATH))/Examples/$(TARGET)/CNN/Common/)
+endif
 VPATH += $(CMSIS_ROOT)/Device/Maxim/$(TARGET_UC)/Source
 # Where to find header files for this test
 IPATH  = .
+ifeq "$(MAXIM_PATH)" ""
+IPATH += ../Common/
+else
+IPATH += /$(subst \,/,$(subst :,,$(MAXIM_PATH))/Examples/$(TARGET)/CNN/Common/)
+endif
+
+# Enable assertion checking for development
+PROJ_CFLAGS+=-DMXC_ASSERT_ENABLE
+
+PROJ_CFLAGS+=-DARM_MATH_CM4
 
 # Enable all warnings
-PROJ_CFLAGS+=-Wall -Wcast-align -DMXC_ASSERT_ENABLE -DARM_MATH_CM4 
+PROJ_CFLAGS+=-Wall -Wcast-align
 
 # Specify the target revision to override default
 # "A2" in ASCII
@@ -99,11 +103,15 @@ PROJ_CFLAGS+=-Wall -Wcast-align -DMXC_ASSERT_ENABLE -DARM_MATH_CM4
 # Use this variables to specify and alternate tool path
 #TOOL_DIR=/opt/gcc-arm-none-eabi-4_8-2013q4/bin
 
+# Use these variables to add project specific tool options
+#PROJ_CFLAGS+=-D__FPU_PRESENT -DKINTEX_EMU
+#PROJ_LDFLAGS+=--specs=nano.specs
+
 # Point this variable to a startup file to override the default file
 #STARTUPFILE=start.S
 
 # Override the default optimization level using this variable
-MXC_OPTIMIZE_CFLAGS=-O2
+MXC_OPTIMIZE_CFLAGS=-O1
 
 ################################################################################
 # Include external library makefiles here

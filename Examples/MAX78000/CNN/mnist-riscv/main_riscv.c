@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All rights Reserved.
+* Copyright (C) 2020-2021 Maxim Integrated Products, Inc., All rights Reserved.
 *
 * This software is protected by copyright laws of the United States and
 * of foreign countries. This material may also be protected by patent laws
@@ -33,7 +33,7 @@
 *******************************************************************************/
 
 // mnist-riscv
-// Created using ai8xize.py --test-dir Examples/MAX78000/CNN --prefix mnist-riscv --checkpoint-file trained/ai85-mnist-qat8-q.pth.tar --config-file networks/mnist-chw-ai85.yaml --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint --verbose --riscv --riscv-debug
+// Created using ./ai8xize.py --verbose --log --test-dir sdk/Examples/MAX78000/CNN --prefix mnist-riscv --checkpoint-file trained/ai85-mnist-qat8-q.pth.tar --config-file networks/mnist-chw-ai85.yaml --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint --riscv --riscv-debug
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -44,7 +44,6 @@
 #include "sema_regs.h"
 #include "cnn.h"
 #include "sampledata.h"
-#include "sampleoutput.h"
 
 volatile uint32_t cnn_time; // Stopwatch
 
@@ -66,26 +65,19 @@ void load_input(void)
   memcpy32((uint32_t *) 0x50400000, input_0, 196);
 }
 
-// Expected output of layer 4 for mnist-riscv given the sample input (known-answer test)
-// Delete this function for production code
-static const uint32_t sample_output[] = SAMPLE_OUTPUT;
+// Expected output of layer 4 for mnist-riscv given the sample input
 int check_output(void)
 {
-  int i;
-  uint32_t mask, len;
-  volatile uint32_t *addr;
-  const uint32_t *ptr = sample_output;
-
-  while ((addr = (volatile uint32_t *) *ptr++) != 0) {
-    mask = *ptr++;
-    len = *ptr++;
-    for (i = 0; i < len; i++)
-      if ((*addr++ & mask) != *ptr++) {
-        printf("Data mismatch (%d/%d) at address 0x%08x: Expected 0x%08x, read 0x%08x.\n",
-               i + 1, len, addr - 1, *(ptr - 1), *(addr - 1) & mask);
-        return CNN_FAIL;
-      }
-  }
+  if ((*((volatile uint32_t *) 0x50401000)) != 0xfffecf58) return CNN_FAIL; // 0,0,0
+  if ((*((volatile uint32_t *) 0x50401004)) != 0x00016cc1) return CNN_FAIL; // 0,0,1
+  if ((*((volatile uint32_t *) 0x50401008)) != 0x0000b1ac) return CNN_FAIL; // 0,0,2
+  if ((*((volatile uint32_t *) 0x5040100c)) != 0x0000749a) return CNN_FAIL; // 0,0,3
+  if ((*((volatile uint32_t *) 0x50409000)) != 0xffff7268) return CNN_FAIL; // 0,0,4
+  if ((*((volatile uint32_t *) 0x50409004)) != 0xfffe0062) return CNN_FAIL; // 0,0,5
+  if ((*((volatile uint32_t *) 0x50409008)) != 0xfffbd7f1) return CNN_FAIL; // 0,0,6
+  if ((*((volatile uint32_t *) 0x5040900c)) != 0x00065b68) return CNN_FAIL; // 0,0,7
+  if ((*((volatile uint32_t *) 0x50411000)) != 0xfffdbad1) return CNN_FAIL; // 0,0,8
+  if ((*((volatile uint32_t *) 0x50411004)) != 0x000061f1) return CNN_FAIL; // 0,0,9
 
   return CNN_OK;
 }
@@ -112,7 +104,7 @@ int main(void)
   // CNN clock: 50 MHz div 1
   cnn_enable(MXC_S_GCR_PCLKDIV_CNNCLKSEL_PCLK, MXC_S_GCR_PCLKDIV_CNNCLKDIV_DIV1);
 
-  printf("\n*** CNN Inference Test ***\n");
+  printf("\n*** RISC-V CNN Inference Test ***\n");
 
   cnn_init(); // Bring state machine into consistent state
   cnn_load_weights(); // Load kernels
@@ -152,11 +144,6 @@ int main(void)
 /*
   SUMMARY OF OPS
   Hardware: 10,883,968 ops (10,751,808 macc; 128,576 comp; 3,584 add; 0 mul; 0 bitwise)
-    Layer 0: 470,400 ops (423,360 macc; 47,040 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 1: 8,356,800 ops (8,294,400 macc; 62,400 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 2: 1,954,304 ops (1,935,360 macc; 18,944 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 3: 100,544 ops (96,768 macc; 192 comp; 3,584 add; 0 mul; 0 bitwise)
-    Layer 4: 1,920 ops (1,920 macc; 0 comp; 0 add; 0 mul; 0 bitwise)
 
   RESOURCE USAGE
   Weight memory: 71,148 bytes out of 442,368 bytes total (16%)

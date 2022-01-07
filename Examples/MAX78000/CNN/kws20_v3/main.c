@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All rights Reserved.
+* Copyright (C) 2020-2021 Maxim Integrated Products, Inc., All rights Reserved.
 *
 * This software is protected by copyright laws of the United States and
 * of foreign countries. This material may also be protected by patent laws
@@ -33,7 +33,7 @@
 *******************************************************************************/
 
 // kws20_v3
-// Created using ai8xize.py --test-dir Examples/MAX78000/CNN --prefix kws20_v3 --checkpoint-file trained/ai85-kws20_v3-qat8-q.pth.tar --config-file networks/kws20-v3-hwc.yaml --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
+// Created using ./ai8xize.py --verbose --log --test-dir sdk/Examples/MAX78000/CNN --prefix kws20_v3 --checkpoint-file trained/ai85-kws20_v3-qat8-q.pth.tar --config-file networks/kws20-v3-hwc.yaml --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -42,14 +42,14 @@
 #include "mxc.h"
 #include "cnn.h"
 #include "sampledata.h"
-#include "sampleoutput.h"
 
 volatile uint32_t cnn_time; // Stopwatch
 
 void fail(void)
 {
-  printf("\n*** FAIL ***\n\n");
-  while (1);
+    printf("\n*** FAIL ***\n\n");
+
+    while (1);
 }
 
 // 128-channel 128x1 data input (16384 bytes total / 128 bytes per channel):
@@ -119,48 +119,114 @@ static const uint32_t input_60[] = SAMPLE_INPUT_60;
 
 void load_input(void)
 {
-  // This function loads the sample data input -- replace with actual data
+    // This function loads the sample data input -- replace with actual data
 
-  memcpy32((uint32_t *) 0x50400000, input_0, 256);
-  memcpy32((uint32_t *) 0x50408000, input_4, 256);
-  memcpy32((uint32_t *) 0x50410000, input_8, 256);
-  memcpy32((uint32_t *) 0x50418000, input_12, 256);
-  memcpy32((uint32_t *) 0x50800000, input_16, 256);
-  memcpy32((uint32_t *) 0x50808000, input_20, 256);
-  memcpy32((uint32_t *) 0x50810000, input_24, 256);
-  memcpy32((uint32_t *) 0x50818000, input_28, 256);
-  memcpy32((uint32_t *) 0x50c00000, input_32, 256);
-  memcpy32((uint32_t *) 0x50c08000, input_36, 256);
-  memcpy32((uint32_t *) 0x50c10000, input_40, 256);
-  memcpy32((uint32_t *) 0x50c18000, input_44, 256);
-  memcpy32((uint32_t *) 0x51000000, input_48, 256);
-  memcpy32((uint32_t *) 0x51008000, input_52, 256);
-  memcpy32((uint32_t *) 0x51010000, input_56, 256);
-  memcpy32((uint32_t *) 0x51018000, input_60, 256);
+    memcpy32((uint32_t*) 0x50400000, input_0, 256);
+    memcpy32((uint32_t*) 0x50408000, input_4, 256);
+    memcpy32((uint32_t*) 0x50410000, input_8, 256);
+    memcpy32((uint32_t*) 0x50418000, input_12, 256);
+    memcpy32((uint32_t*) 0x50800000, input_16, 256);
+    memcpy32((uint32_t*) 0x50808000, input_20, 256);
+    memcpy32((uint32_t*) 0x50810000, input_24, 256);
+    memcpy32((uint32_t*) 0x50818000, input_28, 256);
+    memcpy32((uint32_t*) 0x50c00000, input_32, 256);
+    memcpy32((uint32_t*) 0x50c08000, input_36, 256);
+    memcpy32((uint32_t*) 0x50c10000, input_40, 256);
+    memcpy32((uint32_t*) 0x50c18000, input_44, 256);
+    memcpy32((uint32_t*) 0x51000000, input_48, 256);
+    memcpy32((uint32_t*) 0x51008000, input_52, 256);
+    memcpy32((uint32_t*) 0x51010000, input_56, 256);
+    memcpy32((uint32_t*) 0x51018000, input_60, 256);
 }
 
-// Expected output of layer 8 for kws20_v3 given the sample input (known-answer test)
-// Delete this function for production code
-static const uint32_t sample_output[] = SAMPLE_OUTPUT;
+// Expected output of layer 8 for kws20_v3 given the sample input
 int check_output(void)
 {
-  int i;
-  uint32_t mask, len;
-  volatile uint32_t *addr;
-  const uint32_t *ptr = sample_output;
+    if ((*((volatile uint32_t*) 0x50402000)) != 0x000000bf) {
+        return CNN_FAIL;    // 0,0,0
+    }
 
-  while ((addr = (volatile uint32_t *) *ptr++) != 0) {
-    mask = *ptr++;
-    len = *ptr++;
-    for (i = 0; i < len; i++)
-      if ((*addr++ & mask) != *ptr++) {
-        printf("Data mismatch (%d/%d) at address 0x%08x: Expected 0x%08x, read 0x%08x.\n",
-               i + 1, len, addr - 1, *(ptr - 1), *(addr - 1) & mask);
-        return CNN_FAIL;
-      }
-  }
+    if ((*((volatile uint32_t*) 0x50402004)) != 0xfffc67a9) {
+        return CNN_FAIL;    // 0,0,1
+    }
 
-  return CNN_OK;
+    if ((*((volatile uint32_t*) 0x50402008)) != 0xfffe4339) {
+        return CNN_FAIL;    // 0,0,2
+    }
+
+    if ((*((volatile uint32_t*) 0x5040200c)) != 0xfffefbe3) {
+        return CNN_FAIL;    // 0,0,3
+    }
+
+    if ((*((volatile uint32_t*) 0x5040a000)) != 0xffff6a97) {
+        return CNN_FAIL;    // 0,0,4
+    }
+
+    if ((*((volatile uint32_t*) 0x5040a004)) != 0x0002763a) {
+        return CNN_FAIL;    // 0,0,5
+    }
+
+    if ((*((volatile uint32_t*) 0x5040a008)) != 0xfffadbbb) {
+        return CNN_FAIL;    // 0,0,6
+    }
+
+    if ((*((volatile uint32_t*) 0x5040a00c)) != 0xffffde3a) {
+        return CNN_FAIL;    // 0,0,7
+    }
+
+    if ((*((volatile uint32_t*) 0x50412000)) != 0x00005e92) {
+        return CNN_FAIL;    // 0,0,8
+    }
+
+    if ((*((volatile uint32_t*) 0x50412004)) != 0x0001aa19) {
+        return CNN_FAIL;    // 0,0,9
+    }
+
+    if ((*((volatile uint32_t*) 0x50412008)) != 0x0000240c) {
+        return CNN_FAIL;    // 0,0,10
+    }
+
+    if ((*((volatile uint32_t*) 0x5041200c)) != 0xfffe875e) {
+        return CNN_FAIL;    // 0,0,11
+    }
+
+    if ((*((volatile uint32_t*) 0x5041a000)) != 0xfffe3c0d) {
+        return CNN_FAIL;    // 0,0,12
+    }
+
+    if ((*((volatile uint32_t*) 0x5041a004)) != 0x0002d0ac) {
+        return CNN_FAIL;    // 0,0,13
+    }
+
+    if ((*((volatile uint32_t*) 0x5041a008)) != 0xfffd0f78) {
+        return CNN_FAIL;    // 0,0,14
+    }
+
+    if ((*((volatile uint32_t*) 0x5041a00c)) != 0xfffe03ec) {
+        return CNN_FAIL;    // 0,0,15
+    }
+
+    if ((*((volatile uint32_t*) 0x50802000)) != 0xfffc55a2) {
+        return CNN_FAIL;    // 0,0,16
+    }
+
+    if ((*((volatile uint32_t*) 0x50802004)) != 0xfffcd183) {
+        return CNN_FAIL;    // 0,0,17
+    }
+
+    if ((*((volatile uint32_t*) 0x50802008)) != 0xfffb9765) {
+        return CNN_FAIL;    // 0,0,18
+    }
+
+    if ((*((volatile uint32_t*) 0x5080200c)) != 0xfffea4a5) {
+        return CNN_FAIL;    // 0,0,19
+    }
+
+    if ((*((volatile uint32_t*) 0x5080a000)) != 0x00022ca2) {
+        return CNN_FAIL;    // 0,0,20
+    }
+
+    return CNN_OK;
 }
 
 // Classification layer:
@@ -169,80 +235,74 @@ static q15_t ml_softmax[CNN_NUM_OUTPUTS];
 
 void softmax_layer(void)
 {
-  cnn_unload((uint32_t *) ml_data);
-  softmax_q17p14_q15((const q31_t *) ml_data, CNN_NUM_OUTPUTS, ml_softmax);
+    cnn_unload((uint32_t*) ml_data);
+    softmax_q17p14_q15((const q31_t*) ml_data, CNN_NUM_OUTPUTS, ml_softmax);
 }
 
 int main(void)
 {
-  int i;
-  int digs, tens;
+    int i;
+    int digs, tens;
 
-  MXC_ICC_Enable(MXC_ICC0); // Enable cache
+    MXC_ICC_Enable(MXC_ICC0); // Enable cache
 
-  // Switch to 100 MHz clock
-  MXC_SYS_Clock_Select(MXC_SYS_CLOCK_IPO);
-  SystemCoreClockUpdate();
+    // Switch to 100 MHz clock
+    MXC_SYS_Clock_Select(MXC_SYS_CLOCK_IPO);
+    SystemCoreClockUpdate();
 
-  printf("Waiting...\n");
+    printf("Waiting...\n");
 
-  // DO NOT DELETE THIS LINE:
-  MXC_Delay(SEC(2)); // Let debugger interrupt if needed
+    // DO NOT DELETE THIS LINE:
+    MXC_Delay(SEC(2)); // Let debugger interrupt if needed
 
-  // Enable peripheral, enable CNN interrupt, turn on CNN clock
-  // CNN clock: 50 MHz div 1
-  cnn_enable(MXC_S_GCR_PCLKDIV_CNNCLKSEL_PCLK, MXC_S_GCR_PCLKDIV_CNNCLKDIV_DIV1);
+    // Enable peripheral, enable CNN interrupt, turn on CNN clock
+    // CNN clock: 50 MHz div 1
+    cnn_enable(MXC_S_GCR_PCLKDIV_CNNCLKSEL_PCLK, MXC_S_GCR_PCLKDIV_CNNCLKDIV_DIV1);
 
-  printf("\n*** CNN Inference Test ***\n");
+    printf("\n*** CNN Inference Test ***\n");
 
-  cnn_init(); // Bring state machine into consistent state
-  cnn_load_weights(); // Load kernels
-  cnn_load_bias(); // Not used in this network
-  cnn_configure(); // Configure state machine
-  load_input(); // Load data input
-  cnn_start(); // Start CNN processing
+    cnn_init(); // Bring state machine into consistent state
+    cnn_load_weights(); // Load kernels
+    // cnn_load_bias(); // Not used in this network
+    cnn_configure(); // Configure state machine
+    load_input(); // Load data input
+    cnn_start(); // Start CNN processing
 
-  SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk; // SLEEPDEEP=0
-  while (cnn_time == 0)
-    __WFI(); // Wait for CNN
+    while (cnn_time == 0) {
+        __WFI();    // Wait for CNN
+    }
 
-  if (check_output() != CNN_OK) fail();
-  softmax_layer();
+    if (check_output() != CNN_OK) {
+        fail();
+    }
 
-  printf("\n*** PASS ***\n\n");
+    softmax_layer();
+
+    printf("\n*** PASS ***\n\n");
 
 #ifdef CNN_INFERENCE_TIMER
-  printf("Approximate inference time: %u us\n\n", cnn_time);
+    printf("Approximate inference time: %d us\n\n", cnn_time);
 #endif
 
-  cnn_disable(); // Shut down CNN clock, disable peripheral
+    cnn_disable(); // Shut down CNN clock, disable peripheral
 
-  printf("Classification results:\n");
-  for (i = 0; i < CNN_NUM_OUTPUTS; i++) {
-    digs = (1000 * ml_softmax[i] + 0x4000) >> 15;
-    tens = digs % 10;
-    digs = digs / 10;
-    printf("[%7d] -> Class %d: %d.%d%%\n", ml_data[i], i, digs, tens);
-  }
+    printf("Classification results:\n");
 
-  return 0;
+    for (i = 0; i < CNN_NUM_OUTPUTS; i++) {
+        digs = (1000 * ml_softmax[i] + 0x4000) >> 15;
+        tens = digs % 10;
+        digs = digs / 10;
+        printf("[%7d] -> Class %d: %d.%d%%\n", ml_data[i], i, digs, tens);
+    }
+
+    return 0;
 }
 
 /*
   SUMMARY OF OPS
   Hardware: 8,402,528 ops (8,345,344 macc; 54,496 comp; 2,688 add; 0 mul; 0 bitwise)
-    Layer 0: 1,651,200 ops (1,638,400 macc; 12,800 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 1: 3,640,896 ops (3,628,800 macc; 12,096 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 2: 1,177,344 ops (1,161,216 macc; 16,128 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 3: 565,104 ops (562,176 macc; 2,928 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 4: 281,280 ops (276,480 macc; 4,800 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 5: 518,784 ops (516,096 macc; 2,688 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 6: 407,288 ops (403,200 macc; 1,400 comp; 2,688 add; 0 mul; 0 bitwise)
-    Layer 7: 155,256 ops (153,600 macc; 1,656 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 8: 5,376 ops (5,376 macc; 0 comp; 0 add; 0 mul; 0 bitwise)
 
   RESOURCE USAGE
   Weight memory: 169,472 bytes out of 442,368 bytes total (38%)
   Bias memory:   0 bytes out of 2,048 bytes total (0%)
 */
-

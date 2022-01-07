@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All rights Reserved.
+* Copyright (C) 2020-2021 Maxim Integrated Products, Inc., All rights Reserved.
 *
 * This software is protected by copyright laws of the United States and
 * of foreign countries. This material may also be protected by patent laws
@@ -33,7 +33,7 @@
 *******************************************************************************/
 
 // cifar-10
-// Created using ai8xize.py --test-dir Examples/MAX78000/CNN --prefix cifar-10 --checkpoint-file trained/ai85-cifar10-qat8-q.pth.tar --config-file networks/cifar10-nas.yaml --sample-input tests/sample_cifar-10.npy --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
+// Created using ./ai8xize.py --verbose --log --test-dir sdk/Examples/MAX78000/CNN --prefix cifar-10 --checkpoint-file trained/ai85-cifar10-qat8-q.pth.tar --config-file networks/cifar10-hwc-ai85.yaml --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -42,7 +42,6 @@
 #include "mxc.h"
 #include "cnn.h"
 #include "sampledata.h"
-#include "sampleoutput.h"
 
 volatile uint32_t cnn_time; // Stopwatch
 
@@ -63,26 +62,19 @@ void load_input(void)
   memcpy32((uint32_t *) 0x50400000, input_0, 1024);
 }
 
-// Expected output of layer 10 for cifar-10 given the sample input (known-answer test)
-// Delete this function for production code
-static const uint32_t sample_output[] = SAMPLE_OUTPUT;
+// Expected output of layer 4 for cifar-10 given the sample input
 int check_output(void)
 {
-  int i;
-  uint32_t mask, len;
-  volatile uint32_t *addr;
-  const uint32_t *ptr = sample_output;
-
-  while ((addr = (volatile uint32_t *) *ptr++) != 0) {
-    mask = *ptr++;
-    len = *ptr++;
-    for (i = 0; i < len; i++)
-      if ((*addr++ & mask) != *ptr++) {
-        printf("Data mismatch (%d/%d) at address 0x%08x: Expected 0x%08x, read 0x%08x.\n",
-               i + 1, len, addr - 1, *(ptr - 1), *(addr - 1) & mask);
-        return CNN_FAIL;
-      }
-  }
+  if ((*((volatile uint32_t *) 0x50401000)) != 0xfffc71b5) return CNN_FAIL; // 0,0,0
+  if ((*((volatile uint32_t *) 0x50401004)) != 0xfffd8daa) return CNN_FAIL; // 0,0,1
+  if ((*((volatile uint32_t *) 0x50401008)) != 0xfffe3168) return CNN_FAIL; // 0,0,2
+  if ((*((volatile uint32_t *) 0x5040100c)) != 0x000474f5) return CNN_FAIL; // 0,0,3
+  if ((*((volatile uint32_t *) 0x50409000)) != 0xfffc9f00) return CNN_FAIL; // 0,0,4
+  if ((*((volatile uint32_t *) 0x50409004)) != 0x000168ca) return CNN_FAIL; // 0,0,5
+  if ((*((volatile uint32_t *) 0x50409008)) != 0x00017df5) return CNN_FAIL; // 0,0,6
+  if ((*((volatile uint32_t *) 0x5040900c)) != 0xfffcafc9) return CNN_FAIL; // 0,0,7
+  if ((*((volatile uint32_t *) 0x50411000)) != 0xfffea0a6) return CNN_FAIL; // 0,0,8
+  if ((*((volatile uint32_t *) 0x50411004)) != 0xfffb4fd5) return CNN_FAIL; // 0,0,9
 
   return CNN_OK;
 }
@@ -126,7 +118,6 @@ int main(void)
   load_input(); // Load data input
   cnn_start(); // Start CNN processing
 
-  SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk; // SLEEPDEEP=0
   while (cnn_time == 0)
     __WFI(); // Wait for CNN
 
@@ -154,21 +145,10 @@ int main(void)
 
 /*
   SUMMARY OF OPS
-  Hardware: 36,481,536 ops (36,180,992 macc; 300,544 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 0: 1,835,008 ops (1,769,472 macc; 65,536 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 1: 2,129,920 ops (2,097,152 macc; 32,768 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 2: 18,939,904 ops (18,874,368 macc; 65,536 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 3: 4,792,320 ops (4,718,592 macc; 73,728 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 4: 540,672 ops (524,288 macc; 16,384 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 5: 4,743,168 ops (4,718,592 macc; 24,576 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 6: 1,056,768 ops (1,048,576 macc; 8,192 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 7: 1,188,864 ops (1,179,648 macc; 9,216 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 8: 1,181,696 ops (1,179,648 macc; 2,048 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 9: 68,096 ops (65,536 macc; 2,560 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 10: 5,120 ops (5,120 macc; 0 comp; 0 add; 0 mul; 0 bitwise)
+  Hardware: 12,148,288 ops (11,987,328 macc; 157,376 comp; 3,584 add; 0 mul; 0 bitwise)
 
   RESOURCE USAGE
-  Weight memory: 301,760 bytes out of 442,368 bytes total (68%)
-  Bias memory:   842 bytes out of 2,048 bytes total (41%)
+  Weight memory: 72,228 bytes out of 442,368 bytes total (16%)
+  Bias memory:   10 bytes out of 2,048 bytes total (0%)
 */
 

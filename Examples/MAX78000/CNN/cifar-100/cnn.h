@@ -1,5 +1,5 @@
 /**************************************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc. All Rights Reserved.
+* Copyright (C) 2020-2021 Maxim Integrated Products, Inc. All Rights Reserved.
 *
 * Maxim Integrated Products, Inc. Default Copyright Notice:
 * https://www.maximintegrated.com/en/aboutus/legal/copyrights.html
@@ -23,22 +23,11 @@ typedef int16_t q15_t;
 
 /*
   SUMMARY OF OPS
-  Hardware: 36,527,616 ops (36,227,072 macc; 300,544 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 0: 1,835,008 ops (1,769,472 macc; 65,536 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 1: 2,129,920 ops (2,097,152 macc; 32,768 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 2: 18,939,904 ops (18,874,368 macc; 65,536 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 3: 4,792,320 ops (4,718,592 macc; 73,728 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 4: 540,672 ops (524,288 macc; 16,384 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 5: 4,743,168 ops (4,718,592 macc; 24,576 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 6: 1,056,768 ops (1,048,576 macc; 8,192 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 7: 1,188,864 ops (1,179,648 macc; 9,216 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 8: 1,181,696 ops (1,179,648 macc; 2,048 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 9: 68,096 ops (65,536 macc; 2,560 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 10: 51,200 ops (51,200 macc; 0 comp; 0 add; 0 mul; 0 bitwise)
+  Hardware: 18,607,744 ops (18,461,184 macc; 146,560 comp; 0 add; 0 mul; 0 bitwise)
 
   RESOURCE USAGE
-  Weight memory: 347,840 bytes out of 442,368 bytes total (79%)
-  Bias memory:   932 bytes out of 2,048 bytes total (46%)
+  Weight memory: 381,792 bytes out of 442,368 bytes total (86%)
+  Bias memory:   0 bytes out of 2,048 bytes total (0%)
 */
 
 /* Number of outputs for this network */
@@ -48,16 +37,13 @@ typedef int16_t q15_t;
 #define CNN_INFERENCE_TIMER MXC_TMR0
 
 /* Port pin actions used to signal that processing is active */
-
 #define CNN_START LED_On(1)
 #define CNN_COMPLETE LED_Off(1)
 #define SYS_START LED_On(0)
 #define SYS_COMPLETE LED_Off(0)
 
-/* Run software SoftMax on unloaded data */
+/* Unload data from accelerator and run software SoftMax */
 void softmax_q17p14_q15(const q31_t * vec_in, const uint16_t dim_vec, q15_t * p_out);
-/* Shift the input, then calculate SoftMax */
-void softmax_shift_q17p14_q15(q31_t * vec_in, const uint16_t dim_vec, uint8_t in_shift, q15_t * p_out);
 
 /* Stopwatch - holds the runtime when accelerator finishes */
 extern volatile uint32_t cnn_time;

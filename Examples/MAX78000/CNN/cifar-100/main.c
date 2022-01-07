@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All rights Reserved.
+* Copyright (C) 2020-2021 Maxim Integrated Products, Inc., All rights Reserved.
 *
 * This software is protected by copyright laws of the United States and
 * of foreign countries. This material may also be protected by patent laws
@@ -33,7 +33,7 @@
 *******************************************************************************/
 
 // cifar-100
-// Created using ai8xize.py --test-dir Examples/MAX78000/CNN --prefix cifar-100 --checkpoint-file trained/ai85-cifar100-qat8-q.pth.tar --config-file networks/cifar100-nas.yaml --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint --verbose --boost 2.5
+// Created using ./ai8xize.py --verbose --log --test-dir sdk/Examples/MAX78000/CNN --prefix cifar-100 --checkpoint-file trained/ai85-cifar100-qat8-q.pth.tar --config-file networks/cifar100-simple.yaml --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint --boost 2.5
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -42,7 +42,6 @@
 #include "mxc.h"
 #include "cnn.h"
 #include "sampledata.h"
-#include "sampleoutput.h"
 
 volatile uint32_t cnn_time; // Stopwatch
 
@@ -63,26 +62,109 @@ void load_input(void)
   memcpy32((uint32_t *) 0x50400000, input_0, 1024);
 }
 
-// Expected output of layer 10 for cifar-100 given the sample input (known-answer test)
-// Delete this function for production code
-static const uint32_t sample_output[] = SAMPLE_OUTPUT;
+// Expected output of layer 13 for cifar-100 given the sample input
 int check_output(void)
 {
-  int i;
-  uint32_t mask, len;
-  volatile uint32_t *addr;
-  const uint32_t *ptr = sample_output;
-
-  while ((addr = (volatile uint32_t *) *ptr++) != 0) {
-    mask = *ptr++;
-    len = *ptr++;
-    for (i = 0; i < len; i++)
-      if ((*addr++ & mask) != *ptr++) {
-        printf("Data mismatch (%d/%d) at address 0x%08x: Expected 0x%08x, read 0x%08x.\n",
-               i + 1, len, addr - 1, *(ptr - 1), *(addr - 1) & mask);
-        return CNN_FAIL;
-      }
-  }
+  if ((*((volatile uint32_t *) 0x50400000)) != 0x000416b6) return CNN_FAIL; // 0,0,0
+  if ((*((volatile uint32_t *) 0x50400004)) != 0x00004938) return CNN_FAIL; // 0,0,1
+  if ((*((volatile uint32_t *) 0x50400008)) != 0xfffff657) return CNN_FAIL; // 0,0,2
+  if ((*((volatile uint32_t *) 0x5040000c)) != 0xffff8016) return CNN_FAIL; // 0,0,3
+  if ((*((volatile uint32_t *) 0x50408000)) != 0xfffe6bda) return CNN_FAIL; // 0,0,4
+  if ((*((volatile uint32_t *) 0x50408004)) != 0x000079fa) return CNN_FAIL; // 0,0,5
+  if ((*((volatile uint32_t *) 0x50408008)) != 0x00000af9) return CNN_FAIL; // 0,0,6
+  if ((*((volatile uint32_t *) 0x5040800c)) != 0xffff6250) return CNN_FAIL; // 0,0,7
+  if ((*((volatile uint32_t *) 0x50410000)) != 0xffff358e) return CNN_FAIL; // 0,0,8
+  if ((*((volatile uint32_t *) 0x50410004)) != 0x000217e9) return CNN_FAIL; // 0,0,9
+  if ((*((volatile uint32_t *) 0x50410008)) != 0x0001d0c1) return CNN_FAIL; // 0,0,10
+  if ((*((volatile uint32_t *) 0x5041000c)) != 0xffff5256) return CNN_FAIL; // 0,0,11
+  if ((*((volatile uint32_t *) 0x50418000)) != 0xfffdc056) return CNN_FAIL; // 0,0,12
+  if ((*((volatile uint32_t *) 0x50418004)) != 0x00007407) return CNN_FAIL; // 0,0,13
+  if ((*((volatile uint32_t *) 0x50418008)) != 0x000022a0) return CNN_FAIL; // 0,0,14
+  if ((*((volatile uint32_t *) 0x5041800c)) != 0x00002126) return CNN_FAIL; // 0,0,15
+  if ((*((volatile uint32_t *) 0x50800000)) != 0x0001532b) return CNN_FAIL; // 0,0,16
+  if ((*((volatile uint32_t *) 0x50800004)) != 0xffff8e1b) return CNN_FAIL; // 0,0,17
+  if ((*((volatile uint32_t *) 0x50800008)) != 0x0000c441) return CNN_FAIL; // 0,0,18
+  if ((*((volatile uint32_t *) 0x5080000c)) != 0x00002c46) return CNN_FAIL; // 0,0,19
+  if ((*((volatile uint32_t *) 0x50808000)) != 0xffff33da) return CNN_FAIL; // 0,0,20
+  if ((*((volatile uint32_t *) 0x50808004)) != 0xfffd948c) return CNN_FAIL; // 0,0,21
+  if ((*((volatile uint32_t *) 0x50808008)) != 0x000058ab) return CNN_FAIL; // 0,0,22
+  if ((*((volatile uint32_t *) 0x5080800c)) != 0x00006ca3) return CNN_FAIL; // 0,0,23
+  if ((*((volatile uint32_t *) 0x50810000)) != 0xffff81d9) return CNN_FAIL; // 0,0,24
+  if ((*((volatile uint32_t *) 0x50810004)) != 0x000179a7) return CNN_FAIL; // 0,0,25
+  if ((*((volatile uint32_t *) 0x50810008)) != 0xffffa4e7) return CNN_FAIL; // 0,0,26
+  if ((*((volatile uint32_t *) 0x5081000c)) != 0xfffdd2c4) return CNN_FAIL; // 0,0,27
+  if ((*((volatile uint32_t *) 0x50818000)) != 0x00007756) return CNN_FAIL; // 0,0,28
+  if ((*((volatile uint32_t *) 0x50818004)) != 0xffff3267) return CNN_FAIL; // 0,0,29
+  if ((*((volatile uint32_t *) 0x50818008)) != 0xfffd4ead) return CNN_FAIL; // 0,0,30
+  if ((*((volatile uint32_t *) 0x5081800c)) != 0xffff4240) return CNN_FAIL; // 0,0,31
+  if ((*((volatile uint32_t *) 0x50c00000)) != 0x0000a9a5) return CNN_FAIL; // 0,0,32
+  if ((*((volatile uint32_t *) 0x50c00004)) != 0x00004b00) return CNN_FAIL; // 0,0,33
+  if ((*((volatile uint32_t *) 0x50c00008)) != 0xfffeda17) return CNN_FAIL; // 0,0,34
+  if ((*((volatile uint32_t *) 0x50c0000c)) != 0xffff1e0a) return CNN_FAIL; // 0,0,35
+  if ((*((volatile uint32_t *) 0x50c08000)) != 0xffff505b) return CNN_FAIL; // 0,0,36
+  if ((*((volatile uint32_t *) 0x50c08004)) != 0xfffe76f5) return CNN_FAIL; // 0,0,37
+  if ((*((volatile uint32_t *) 0x50c08008)) != 0xfffd0699) return CNN_FAIL; // 0,0,38
+  if ((*((volatile uint32_t *) 0x50c0800c)) != 0x000119b4) return CNN_FAIL; // 0,0,39
+  if ((*((volatile uint32_t *) 0x50c10000)) != 0x00006811) return CNN_FAIL; // 0,0,40
+  if ((*((volatile uint32_t *) 0x50c10004)) != 0xfffe8a56) return CNN_FAIL; // 0,0,41
+  if ((*((volatile uint32_t *) 0x50c10008)) != 0xfffda76a) return CNN_FAIL; // 0,0,42
+  if ((*((volatile uint32_t *) 0x50c1000c)) != 0xfffeb44b) return CNN_FAIL; // 0,0,43
+  if ((*((volatile uint32_t *) 0x50c18000)) != 0xffff1bfb) return CNN_FAIL; // 0,0,44
+  if ((*((volatile uint32_t *) 0x50c18004)) != 0x0000f390) return CNN_FAIL; // 0,0,45
+  if ((*((volatile uint32_t *) 0x50c18008)) != 0xffff2ddd) return CNN_FAIL; // 0,0,46
+  if ((*((volatile uint32_t *) 0x50c1800c)) != 0x0001743a) return CNN_FAIL; // 0,0,47
+  if ((*((volatile uint32_t *) 0x51000000)) != 0xfffe93ab) return CNN_FAIL; // 0,0,48
+  if ((*((volatile uint32_t *) 0x51000004)) != 0xfffec2a2) return CNN_FAIL; // 0,0,49
+  if ((*((volatile uint32_t *) 0x51000008)) != 0xfffe75a2) return CNN_FAIL; // 0,0,50
+  if ((*((volatile uint32_t *) 0x5100000c)) != 0x00003336) return CNN_FAIL; // 0,0,51
+  if ((*((volatile uint32_t *) 0x50400010)) != 0x00000995) return CNN_FAIL; // 0,0,52
+  if ((*((volatile uint32_t *) 0x50400014)) != 0x00026cf4) return CNN_FAIL; // 0,0,53
+  if ((*((volatile uint32_t *) 0x50400018)) != 0x000052bc) return CNN_FAIL; // 0,0,54
+  if ((*((volatile uint32_t *) 0x5040001c)) != 0xfffe9089) return CNN_FAIL; // 0,0,55
+  if ((*((volatile uint32_t *) 0x50408010)) != 0x00008189) return CNN_FAIL; // 0,0,56
+  if ((*((volatile uint32_t *) 0x50408014)) != 0x0003d280) return CNN_FAIL; // 0,0,57
+  if ((*((volatile uint32_t *) 0x50408018)) != 0xffffe7b5) return CNN_FAIL; // 0,0,58
+  if ((*((volatile uint32_t *) 0x5040801c)) != 0xffff41f6) return CNN_FAIL; // 0,0,59
+  if ((*((volatile uint32_t *) 0x50410010)) != 0x0000eb24) return CNN_FAIL; // 0,0,60
+  if ((*((volatile uint32_t *) 0x50410014)) != 0x000013ad) return CNN_FAIL; // 0,0,61
+  if ((*((volatile uint32_t *) 0x50410018)) != 0x00007e9b) return CNN_FAIL; // 0,0,62
+  if ((*((volatile uint32_t *) 0x5041001c)) != 0xfffe4680) return CNN_FAIL; // 0,0,63
+  if ((*((volatile uint32_t *) 0x50418010)) != 0xfffdd81f) return CNN_FAIL; // 0,0,64
+  if ((*((volatile uint32_t *) 0x50418014)) != 0xffff0639) return CNN_FAIL; // 0,0,65
+  if ((*((volatile uint32_t *) 0x50418018)) != 0xfffb2fac) return CNN_FAIL; // 0,0,66
+  if ((*((volatile uint32_t *) 0x5041801c)) != 0x0000ce67) return CNN_FAIL; // 0,0,67
+  if ((*((volatile uint32_t *) 0x50800010)) != 0xfffe306e) return CNN_FAIL; // 0,0,68
+  if ((*((volatile uint32_t *) 0x50800014)) != 0x00008b5e) return CNN_FAIL; // 0,0,69
+  if ((*((volatile uint32_t *) 0x50800018)) != 0x00009927) return CNN_FAIL; // 0,0,70
+  if ((*((volatile uint32_t *) 0x5080001c)) != 0x00005cd5) return CNN_FAIL; // 0,0,71
+  if ((*((volatile uint32_t *) 0x50808010)) != 0xffff5343) return CNN_FAIL; // 0,0,72
+  if ((*((volatile uint32_t *) 0x50808014)) != 0xfffe9bef) return CNN_FAIL; // 0,0,73
+  if ((*((volatile uint32_t *) 0x50808018)) != 0xfffce6b5) return CNN_FAIL; // 0,0,74
+  if ((*((volatile uint32_t *) 0x5080801c)) != 0xfffb712f) return CNN_FAIL; // 0,0,75
+  if ((*((volatile uint32_t *) 0x50810010)) != 0xffffaa12) return CNN_FAIL; // 0,0,76
+  if ((*((volatile uint32_t *) 0x50810014)) != 0x00006b76) return CNN_FAIL; // 0,0,77
+  if ((*((volatile uint32_t *) 0x50810018)) != 0xffff12ae) return CNN_FAIL; // 0,0,78
+  if ((*((volatile uint32_t *) 0x5081001c)) != 0xffffedbd) return CNN_FAIL; // 0,0,79
+  if ((*((volatile uint32_t *) 0x50818010)) != 0xffff9008) return CNN_FAIL; // 0,0,80
+  if ((*((volatile uint32_t *) 0x50818014)) != 0x000047e4) return CNN_FAIL; // 0,0,81
+  if ((*((volatile uint32_t *) 0x50818018)) != 0x00010b7e) return CNN_FAIL; // 0,0,82
+  if ((*((volatile uint32_t *) 0x5081801c)) != 0x0003fe63) return CNN_FAIL; // 0,0,83
+  if ((*((volatile uint32_t *) 0x50c00010)) != 0x0000aa4f) return CNN_FAIL; // 0,0,84
+  if ((*((volatile uint32_t *) 0x50c00014)) != 0xffff4706) return CNN_FAIL; // 0,0,85
+  if ((*((volatile uint32_t *) 0x50c00018)) != 0xffffe47c) return CNN_FAIL; // 0,0,86
+  if ((*((volatile uint32_t *) 0x50c0001c)) != 0xffffeead) return CNN_FAIL; // 0,0,87
+  if ((*((volatile uint32_t *) 0x50c08010)) != 0x00003bf0) return CNN_FAIL; // 0,0,88
+  if ((*((volatile uint32_t *) 0x50c08014)) != 0x00005846) return CNN_FAIL; // 0,0,89
+  if ((*((volatile uint32_t *) 0x50c08018)) != 0xffff7713) return CNN_FAIL; // 0,0,90
+  if ((*((volatile uint32_t *) 0x50c0801c)) != 0xfffe8bee) return CNN_FAIL; // 0,0,91
+  if ((*((volatile uint32_t *) 0x50c10010)) != 0x00028fd3) return CNN_FAIL; // 0,0,92
+  if ((*((volatile uint32_t *) 0x50c10014)) != 0xfffee186) return CNN_FAIL; // 0,0,93
+  if ((*((volatile uint32_t *) 0x50c10018)) != 0x00017a26) return CNN_FAIL; // 0,0,94
+  if ((*((volatile uint32_t *) 0x50c1001c)) != 0xfffe6829) return CNN_FAIL; // 0,0,95
+  if ((*((volatile uint32_t *) 0x50c18010)) != 0x00015200) return CNN_FAIL; // 0,0,96
+  if ((*((volatile uint32_t *) 0x50c18014)) != 0xfffd8f91) return CNN_FAIL; // 0,0,97
+  if ((*((volatile uint32_t *) 0x50c18018)) != 0xffff8341) return CNN_FAIL; // 0,0,98
+  if ((*((volatile uint32_t *) 0x50c1801c)) != 0xffffb9dc) return CNN_FAIL; // 0,0,99
 
   return CNN_OK;
 }
@@ -122,12 +204,11 @@ int main(void)
 
   cnn_init(); // Bring state machine into consistent state
   cnn_load_weights(); // Load kernels
-  cnn_load_bias();
+  // cnn_load_bias(); // Not used in this network
   cnn_configure(); // Configure state machine
   load_input(); // Load data input
   cnn_start(); // Start CNN processing
 
-  SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk; // SLEEPDEEP=0
   while (cnn_time == 0)
     __WFI(); // Wait for CNN
 
@@ -157,21 +238,10 @@ int main(void)
 
 /*
   SUMMARY OF OPS
-  Hardware: 36,527,616 ops (36,227,072 macc; 300,544 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 0: 1,835,008 ops (1,769,472 macc; 65,536 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 1: 2,129,920 ops (2,097,152 macc; 32,768 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 2: 18,939,904 ops (18,874,368 macc; 65,536 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 3: 4,792,320 ops (4,718,592 macc; 73,728 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 4: 540,672 ops (524,288 macc; 16,384 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 5: 4,743,168 ops (4,718,592 macc; 24,576 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 6: 1,056,768 ops (1,048,576 macc; 8,192 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 7: 1,188,864 ops (1,179,648 macc; 9,216 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 8: 1,181,696 ops (1,179,648 macc; 2,048 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 9: 68,096 ops (65,536 macc; 2,560 comp; 0 add; 0 mul; 0 bitwise)
-    Layer 10: 51,200 ops (51,200 macc; 0 comp; 0 add; 0 mul; 0 bitwise)
+  Hardware: 18,607,744 ops (18,461,184 macc; 146,560 comp; 0 add; 0 mul; 0 bitwise)
 
   RESOURCE USAGE
-  Weight memory: 347,840 bytes out of 442,368 bytes total (79%)
-  Bias memory:   932 bytes out of 2,048 bytes total (46%)
+  Weight memory: 381,792 bytes out of 442,368 bytes total (86%)
+  Bias memory:   0 bytes out of 2,048 bytes total (0%)
 */
 

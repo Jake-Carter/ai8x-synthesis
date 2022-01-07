@@ -1,4 +1,4 @@
-ai8xize.py --test-dir Examples/MAX78000/CNN --prefix kws20_v3 --checkpoint-file trained/ai85-kws20_v3-qat8-q.pth.tar --config-file networks/kws20-v3-hwc.yaml --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
+./ai8xize.py --verbose --log --test-dir sdk/Examples/MAX78000/CNN --prefix kws20_v3 --checkpoint-file trained/ai85-kws20_v3-qat8-q.pth.tar --config-file networks/kws20-v3-hwc.yaml --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint
 MAX78000
 
 kws20_v3
@@ -90,15 +90,15 @@ R02   (00d00008): 00000008 // Layer count
 Global configuration:
 ---------------------
 Used processors     = 0xffffffffffffffff
-Used quadrants      = [0, 1, 2, 3]
+Used groups         = [0, 1, 2, 3]
 
-Per-quadrant configuration:
----------------------------
+Per-group configuration:
+-----------------------
 Used bias memory    = [0, 0, 0, 0]
 
 Per-layer configuration:
 ------------------------
-Quadrant map        = [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2, 3]]
+Group map           = [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2], [0, 1, 2, 3], [0, 1, 2, 3]]
 Input offset        = [0x0000, 0x2000, 0x0000, 0x2000, 0x0000, 0x2000, 0x0000, 0x2000, 0x0000]
 Streaming           = [False, False, False, False, False, False, False, False, False]
 Input channels      = [128, 100, 96, 64, 48, 64, 96, 100, 64]
@@ -119,11 +119,10 @@ Expansion threshold = [52, 48, 64, 48, 64, 48, 52, 64, 21]
 Output shift        = [-2, -1, 0, -1, -1, -1, 0, -1, 0]
 Output processors   = [0x000fffffffffffff, 0x0000ffffffffffff, 0xffffffffffffffff, 0x0000ffffffffffff, 0xffffffffffffffff, 0x0000ffffffffffff, 0x000fffffffffffff, 0xffffffffffffffff, 0x00000000001fffff]
 Output data bits    = [8, 8, 8, 8, 8, 8, 8, 8, 32]
-Quadrant with bias  = [None, None, None, None, None, None, None, None, None]
+Group with bias     = [None, None, None, None, None, None, None, None, None]
 Bias offset         = [[None, None, None, None], [None, None, None, None], [None, None, None, None], [None, None, None, None], [None, None, None, None], [None, None, None, None], [None, None, None, None], [None, None, None, None], [None, None, None, None]]
 Output offset       = [0x2000, 0x0000, 0x2000, 0x0000, 0x2000, 0x0000, 0x2000, 0x0000, 0x2000]
-Operator            = [conv1d, conv1d, conv1d, conv1d, conv1d, conv1d, conv1d, conv1d, linear]
-Activation          = [ReLU, ReLU, ReLU, ReLU, ReLU, ReLU, ReLU, ReLU, no]
+Operator            = [conv1d, conv1d, conv1d, conv1d, conv1d, conv1d, conv1d, conv1d, conv2d]
 Kernel offset       = [0, 24, 88, 132, 148, 172, 204, 276, 364]
 Kernel length       = [24, 64, 43, 16, 22, 32, 70, 86, 10]
 Kernel count        = [208, 192, 128, 48, 64, 96, 208, 128, 84]
@@ -152,8 +151,6 @@ L0 G0 R02 (00100110): 00001100 // 1D
 L0 G0 R13 (00100690): 00000000 // TRAM ptr max *
 L0 G0 R15 (00100790): 00024000 // Post processing register
 L0 G0 R14 (00100710): ffffffff // Mask and processor enables
-L0 G0 R16 (00100810): 00000000 // Stream processing start *
-L0 G0 R17 (00100890): 00000000 // Stream processing delta *
 L0 G1 R00 (00500010): 0000007f // Rows
 L0 G1 R01 (00500090): 00000000 // Columns *
 L0 G1 R03 (00500190): 00000000 // Pooling rows *
@@ -171,8 +168,6 @@ L0 G1 R02 (00500110): 00001100 // 1D
 L0 G1 R13 (00500690): 00000000 // TRAM ptr max *
 L0 G1 R15 (00500790): 00024000 // Post processing register
 L0 G1 R14 (00500710): ffffffff // Mask and processor enables
-L0 G1 R16 (00500810): 00000000 // Stream processing start *
-L0 G1 R17 (00500890): 00000000 // Stream processing delta *
 L0 G2 R00 (00900010): 0000007f // Rows
 L0 G2 R01 (00900090): 00000000 // Columns *
 L0 G2 R03 (00900190): 00000000 // Pooling rows *
@@ -190,8 +185,6 @@ L0 G2 R02 (00900110): 00001100 // 1D
 L0 G2 R13 (00900690): 00000000 // TRAM ptr max *
 L0 G2 R15 (00900790): 00024000 // Post processing register
 L0 G2 R14 (00900710): ffffffff // Mask and processor enables
-L0 G2 R16 (00900810): 00000000 // Stream processing start *
-L0 G2 R17 (00900890): 00000000 // Stream processing delta *
 L0 G3 R00 (00d00010): 0000007f // Rows
 L0 G3 R01 (00d00090): 00000000 // Columns *
 L0 G3 R03 (00d00190): 00000000 // Pooling rows *
@@ -209,8 +202,6 @@ L0 G3 R02 (00d00110): 00001100 // 1D
 L0 G3 R13 (00d00690): 00000000 // TRAM ptr max *
 L0 G3 R15 (00d00790): 00024000 // Post processing register
 L0 G3 R14 (00d00710): ffffffff // Mask and processor enables
-L0 G3 R16 (00d00810): 00000000 // Stream processing start *
-L0 G3 R17 (00d00890): 00000000 // Stream processing delta *
 L1 G0 R00 (00100014): 0000007f // Rows
 L1 G0 R01 (00100094): 00000000 // Columns *
 L1 G0 R03 (00100194): 00000000 // Pooling rows *
@@ -228,8 +219,6 @@ L1 G0 R02 (00100114): 00001300 // 1D
 L1 G0 R13 (00100694): 00000000 // TRAM ptr max *
 L1 G0 R15 (00100794): 00022000 // Post processing register
 L1 G0 R14 (00100714): ffffffff // Mask and processor enables
-L1 G0 R16 (00100814): 00000000 // Stream processing start *
-L1 G0 R17 (00100894): 00000000 // Stream processing delta *
 L1 G1 R00 (00500014): 0000007f // Rows
 L1 G1 R01 (00500094): 00000000 // Columns *
 L1 G1 R03 (00500194): 00000000 // Pooling rows *
@@ -247,8 +236,6 @@ L1 G1 R02 (00500114): 00001300 // 1D
 L1 G1 R13 (00500694): 00000000 // TRAM ptr max *
 L1 G1 R15 (00500794): 00022000 // Post processing register
 L1 G1 R14 (00500714): ffffffff // Mask and processor enables
-L1 G1 R16 (00500814): 00000000 // Stream processing start *
-L1 G1 R17 (00500894): 00000000 // Stream processing delta *
 L1 G2 R00 (00900014): 0000007f // Rows
 L1 G2 R01 (00900094): 00000000 // Columns *
 L1 G2 R03 (00900194): 00000000 // Pooling rows *
@@ -266,8 +253,6 @@ L1 G2 R02 (00900114): 00001300 // 1D
 L1 G2 R13 (00900694): 00000000 // TRAM ptr max *
 L1 G2 R15 (00900794): 00022000 // Post processing register
 L1 G2 R14 (00900714): ffffffff // Mask and processor enables
-L1 G2 R16 (00900814): 00000000 // Stream processing start *
-L1 G2 R17 (00900894): 00000000 // Stream processing delta *
 L1 G3 R00 (00d00014): 0000007f // Rows
 L1 G3 R01 (00d00094): 00000000 // Columns *
 L1 G3 R03 (00d00194): 00000000 // Pooling rows *
@@ -285,8 +270,6 @@ L1 G3 R02 (00d00114): 00001300 // 1D
 L1 G3 R13 (00d00694): 00000000 // TRAM ptr max *
 L1 G3 R15 (00d00794): 00022000 // Post processing register
 L1 G3 R14 (00d00714): 000f000f // Mask and processor enables
-L1 G3 R16 (00d00814): 00000000 // Stream processing start *
-L1 G3 R17 (00d00894): 00000000 // Stream processing delta *
 L2 G0 R00 (00100018): 0001007f // Rows
 L2 G0 R01 (00100098): 00000000 // Columns *
 L2 G0 R03 (00100198): 00000001 // Pooling rows
@@ -295,7 +278,7 @@ L2 G0 R05 (00100298): 00000001 // Stride
 L2 G0 R06 (00100318): 00000800 // SRAM write ptr
 L2 G0 R07 (00100398): 00000000 // Write ptr time slot offs *
 L2 G0 R08 (00100418): 00002000 // Write ptr mask offs
-L2 G0 R09 (00100498): 00000000 // Write ptr multi-pass channel offs *
+L2 G0 R09 (00100498): 00000001 // Write ptr multi-pass channel offs
 L2 G0 R10 (00100518): 00000000 // SRAM read ptr *
 L2 G0 R11 (00100598): 00006ba0 // Layer control
 L2 G0 R20 (00100a18): 0001f801 // Layer control 2
@@ -304,8 +287,6 @@ L2 G0 R02 (00100118): 00001300 // 1D
 L2 G0 R13 (00100698): 00000000 // TRAM ptr max *
 L2 G0 R15 (00100798): 00000000 // Post processing register *
 L2 G0 R14 (00100718): ffffffff // Mask and processor enables
-L2 G0 R16 (00100818): 00000000 // Stream processing start *
-L2 G0 R17 (00100898): 00000000 // Stream processing delta *
 L2 G1 R00 (00500018): 0001007f // Rows
 L2 G1 R01 (00500098): 00000000 // Columns *
 L2 G1 R03 (00500198): 00000001 // Pooling rows
@@ -314,7 +295,7 @@ L2 G1 R05 (00500298): 00000001 // Stride
 L2 G1 R06 (00500318): 00000800 // SRAM write ptr
 L2 G1 R07 (00500398): 00000000 // Write ptr time slot offs *
 L2 G1 R08 (00500418): 00002000 // Write ptr mask offs
-L2 G1 R09 (00500498): 00000000 // Write ptr multi-pass channel offs *
+L2 G1 R09 (00500498): 00000001 // Write ptr multi-pass channel offs
 L2 G1 R10 (00500518): 00000000 // SRAM read ptr *
 L2 G1 R11 (00500598): 00000ba0 // Layer control
 L2 G1 R20 (00500a18): 0001f801 // Layer control 2
@@ -323,8 +304,6 @@ L2 G1 R02 (00500118): 00001300 // 1D
 L2 G1 R13 (00500698): 00000000 // TRAM ptr max *
 L2 G1 R15 (00500798): 00000000 // Post processing register *
 L2 G1 R14 (00500718): ffffffff // Mask and processor enables
-L2 G1 R16 (00500818): 00000000 // Stream processing start *
-L2 G1 R17 (00500898): 00000000 // Stream processing delta *
 L2 G2 R00 (00900018): 0001007f // Rows
 L2 G2 R01 (00900098): 00000000 // Columns *
 L2 G2 R03 (00900198): 00000001 // Pooling rows
@@ -333,7 +312,7 @@ L2 G2 R05 (00900298): 00000001 // Stride
 L2 G2 R06 (00900318): 00000800 // SRAM write ptr
 L2 G2 R07 (00900398): 00000000 // Write ptr time slot offs *
 L2 G2 R08 (00900418): 00002000 // Write ptr mask offs
-L2 G2 R09 (00900498): 00000000 // Write ptr multi-pass channel offs *
+L2 G2 R09 (00900498): 00000001 // Write ptr multi-pass channel offs
 L2 G2 R10 (00900518): 00000000 // SRAM read ptr *
 L2 G2 R11 (00900598): 00000ba0 // Layer control
 L2 G2 R20 (00900a18): 0001f801 // Layer control 2
@@ -342,8 +321,6 @@ L2 G2 R02 (00900118): 00001300 // 1D
 L2 G2 R13 (00900698): 00000000 // TRAM ptr max *
 L2 G2 R15 (00900798): 00000000 // Post processing register *
 L2 G2 R14 (00900718): ffffffff // Mask and processor enables
-L2 G2 R16 (00900818): 00000000 // Stream processing start *
-L2 G2 R17 (00900898): 00000000 // Stream processing delta *
 L2 G3 R00 (00d00018): 0001007f // Rows
 L2 G3 R01 (00d00098): 00000000 // Columns *
 L2 G3 R03 (00d00198): 00000001 // Pooling rows
@@ -352,7 +329,7 @@ L2 G3 R05 (00d00298): 00000001 // Stride
 L2 G3 R06 (00d00318): 00000800 // SRAM write ptr
 L2 G3 R07 (00d00398): 00000000 // Write ptr time slot offs *
 L2 G3 R08 (00d00418): 00002000 // Write ptr mask offs
-L2 G3 R09 (00d00498): 00000000 // Write ptr multi-pass channel offs *
+L2 G3 R09 (00d00498): 00000001 // Write ptr multi-pass channel offs
 L2 G3 R10 (00d00518): 00000000 // SRAM read ptr *
 L2 G3 R11 (00d00598): 00000ba0 // Layer control
 L2 G3 R20 (00d00a18): 0001f801 // Layer control 2
@@ -361,8 +338,6 @@ L2 G3 R02 (00d00118): 00001300 // 1D
 L2 G3 R13 (00d00698): 00000000 // TRAM ptr max *
 L2 G3 R15 (00d00798): 00000000 // Post processing register *
 L2 G3 R14 (00d00718): 00000000 // Mask and processor enables *
-L2 G3 R16 (00d00818): 00000000 // Stream processing start *
-L2 G3 R17 (00d00898): 00000000 // Stream processing delta *
 L3 G0 R00 (0010001c): 0000003e // Rows
 L3 G0 R01 (0010009c): 00000000 // Columns *
 L3 G0 R03 (0010019c): 00000000 // Pooling rows *
@@ -371,7 +346,7 @@ L3 G0 R05 (0010029c): 00000000 // Stride *
 L3 G0 R06 (0010031c): 00000000 // SRAM write ptr *
 L3 G0 R07 (0010039c): 00000000 // Write ptr time slot offs *
 L3 G0 R08 (0010041c): 00002000 // Write ptr mask offs
-L3 G0 R09 (0010049c): 00000000 // Write ptr multi-pass channel offs *
+L3 G0 R09 (0010049c): 00000001 // Write ptr multi-pass channel offs
 L3 G0 R10 (0010051c): 00000800 // SRAM read ptr
 L3 G0 R11 (0010059c): 0000eb20 // Layer control
 L3 G0 R20 (00100a1c): 00017800 // Layer control 2
@@ -380,8 +355,6 @@ L3 G0 R02 (0010011c): 00001300 // 1D
 L3 G0 R13 (0010069c): 00000000 // TRAM ptr max *
 L3 G0 R15 (0010079c): 00022000 // Post processing register
 L3 G0 R14 (0010071c): ffffffff // Mask and processor enables
-L3 G0 R16 (0010081c): 00000000 // Stream processing start *
-L3 G0 R17 (0010089c): 00000000 // Stream processing delta *
 L3 G1 R00 (0050001c): 0000003e // Rows
 L3 G1 R01 (0050009c): 00000000 // Columns *
 L3 G1 R03 (0050019c): 00000000 // Pooling rows *
@@ -390,7 +363,7 @@ L3 G1 R05 (0050029c): 00000000 // Stride *
 L3 G1 R06 (0050031c): 00000000 // SRAM write ptr *
 L3 G1 R07 (0050039c): 00000000 // Write ptr time slot offs *
 L3 G1 R08 (0050041c): 00002000 // Write ptr mask offs
-L3 G1 R09 (0050049c): 00000000 // Write ptr multi-pass channel offs *
+L3 G1 R09 (0050049c): 00000001 // Write ptr multi-pass channel offs
 L3 G1 R10 (0050051c): 00000800 // SRAM read ptr
 L3 G1 R11 (0050059c): 00000b20 // Layer control
 L3 G1 R20 (00500a1c): 00017800 // Layer control 2
@@ -399,8 +372,6 @@ L3 G1 R02 (0050011c): 00001300 // 1D
 L3 G1 R13 (0050069c): 00000000 // TRAM ptr max *
 L3 G1 R15 (0050079c): 00022000 // Post processing register
 L3 G1 R14 (0050071c): ffffffff // Mask and processor enables
-L3 G1 R16 (0050081c): 00000000 // Stream processing start *
-L3 G1 R17 (0050089c): 00000000 // Stream processing delta *
 L3 G2 R00 (0090001c): 0000003e // Rows
 L3 G2 R01 (0090009c): 00000000 // Columns *
 L3 G2 R03 (0090019c): 00000000 // Pooling rows *
@@ -409,7 +380,7 @@ L3 G2 R05 (0090029c): 00000000 // Stride *
 L3 G2 R06 (0090031c): 00000000 // SRAM write ptr *
 L3 G2 R07 (0090039c): 00000000 // Write ptr time slot offs *
 L3 G2 R08 (0090041c): 00002000 // Write ptr mask offs
-L3 G2 R09 (0090049c): 00000000 // Write ptr multi-pass channel offs *
+L3 G2 R09 (0090049c): 00000001 // Write ptr multi-pass channel offs
 L3 G2 R10 (0090051c): 00000800 // SRAM read ptr
 L3 G2 R11 (0090059c): 00000b20 // Layer control
 L3 G2 R20 (00900a1c): 00017800 // Layer control 2
@@ -418,8 +389,6 @@ L3 G2 R02 (0090011c): 00001300 // 1D
 L3 G2 R13 (0090069c): 00000000 // TRAM ptr max *
 L3 G2 R15 (0090079c): 00022000 // Post processing register
 L3 G2 R14 (0090071c): ffffffff // Mask and processor enables
-L3 G2 R16 (0090081c): 00000000 // Stream processing start *
-L3 G2 R17 (0090089c): 00000000 // Stream processing delta *
 L3 G3 R00 (00d0001c): 0000003e // Rows
 L3 G3 R01 (00d0009c): 00000000 // Columns *
 L3 G3 R03 (00d0019c): 00000000 // Pooling rows *
@@ -428,7 +397,7 @@ L3 G3 R05 (00d0029c): 00000000 // Stride *
 L3 G3 R06 (00d0031c): 00000000 // SRAM write ptr *
 L3 G3 R07 (00d0039c): 00000000 // Write ptr time slot offs *
 L3 G3 R08 (00d0041c): 00002000 // Write ptr mask offs
-L3 G3 R09 (00d0049c): 00000000 // Write ptr multi-pass channel offs *
+L3 G3 R09 (00d0049c): 00000001 // Write ptr multi-pass channel offs
 L3 G3 R10 (00d0051c): 00000800 // SRAM read ptr
 L3 G3 R11 (00d0059c): 00000b20 // Layer control
 L3 G3 R20 (00d00a1c): 00017800 // Layer control 2
@@ -437,8 +406,6 @@ L3 G3 R02 (00d0011c): 00001300 // 1D
 L3 G3 R13 (00d0069c): 00000000 // TRAM ptr max *
 L3 G3 R15 (00d0079c): 00022000 // Post processing register
 L3 G3 R14 (00d0071c): ffffffff // Mask and processor enables
-L3 G3 R16 (00d0081c): 00000000 // Stream processing start *
-L3 G3 R17 (00d0089c): 00000000 // Stream processing delta *
 L4 G0 R00 (00100020): 0001003e // Rows
 L4 G0 R01 (001000a0): 00000000 // Columns *
 L4 G0 R03 (001001a0): 00000001 // Pooling rows
@@ -447,7 +414,7 @@ L4 G0 R05 (001002a0): 00000001 // Stride
 L4 G0 R06 (00100320): 00000800 // SRAM write ptr
 L4 G0 R07 (001003a0): 00000000 // Write ptr time slot offs *
 L4 G0 R08 (00100420): 00002000 // Write ptr mask offs
-L4 G0 R09 (001004a0): 00000000 // Write ptr multi-pass channel offs *
+L4 G0 R09 (001004a0): 00000001 // Write ptr multi-pass channel offs
 L4 G0 R10 (00100520): 00000000 // SRAM read ptr *
 L4 G0 R11 (001005a0): 00006ba0 // Layer control
 L4 G0 R20 (00100a20): 0001f800 // Layer control 2
@@ -456,8 +423,6 @@ L4 G0 R02 (00100120): 00001300 // 1D
 L4 G0 R13 (001006a0): 00000000 // TRAM ptr max *
 L4 G0 R15 (001007a0): 00022000 // Post processing register
 L4 G0 R14 (00100720): ffffffff // Mask and processor enables
-L4 G0 R16 (00100820): 00000000 // Stream processing start *
-L4 G0 R17 (001008a0): 00000000 // Stream processing delta *
 L4 G1 R00 (00500020): 0001003e // Rows
 L4 G1 R01 (005000a0): 00000000 // Columns *
 L4 G1 R03 (005001a0): 00000001 // Pooling rows
@@ -466,7 +431,7 @@ L4 G1 R05 (005002a0): 00000001 // Stride
 L4 G1 R06 (00500320): 00000800 // SRAM write ptr
 L4 G1 R07 (005003a0): 00000000 // Write ptr time slot offs *
 L4 G1 R08 (00500420): 00002000 // Write ptr mask offs
-L4 G1 R09 (005004a0): 00000000 // Write ptr multi-pass channel offs *
+L4 G1 R09 (005004a0): 00000001 // Write ptr multi-pass channel offs
 L4 G1 R10 (00500520): 00000000 // SRAM read ptr *
 L4 G1 R11 (005005a0): 00000ba0 // Layer control
 L4 G1 R20 (00500a20): 0001f800 // Layer control 2
@@ -475,8 +440,6 @@ L4 G1 R02 (00500120): 00001300 // 1D
 L4 G1 R13 (005006a0): 00000000 // TRAM ptr max *
 L4 G1 R15 (005007a0): 00022000 // Post processing register
 L4 G1 R14 (00500720): ffffffff // Mask and processor enables
-L4 G1 R16 (00500820): 00000000 // Stream processing start *
-L4 G1 R17 (005008a0): 00000000 // Stream processing delta *
 L4 G2 R00 (00900020): 0001003e // Rows
 L4 G2 R01 (009000a0): 00000000 // Columns *
 L4 G2 R03 (009001a0): 00000001 // Pooling rows
@@ -485,7 +448,7 @@ L4 G2 R05 (009002a0): 00000001 // Stride
 L4 G2 R06 (00900320): 00000800 // SRAM write ptr
 L4 G2 R07 (009003a0): 00000000 // Write ptr time slot offs *
 L4 G2 R08 (00900420): 00002000 // Write ptr mask offs
-L4 G2 R09 (009004a0): 00000000 // Write ptr multi-pass channel offs *
+L4 G2 R09 (009004a0): 00000001 // Write ptr multi-pass channel offs
 L4 G2 R10 (00900520): 00000000 // SRAM read ptr *
 L4 G2 R11 (009005a0): 00000ba0 // Layer control
 L4 G2 R20 (00900a20): 0001f800 // Layer control 2
@@ -494,8 +457,6 @@ L4 G2 R02 (00900120): 00001300 // 1D
 L4 G2 R13 (009006a0): 00000000 // TRAM ptr max *
 L4 G2 R15 (009007a0): 00022000 // Post processing register
 L4 G2 R14 (00900720): ffffffff // Mask and processor enables
-L4 G2 R16 (00900820): 00000000 // Stream processing start *
-L4 G2 R17 (009008a0): 00000000 // Stream processing delta *
 L4 G3 R00 (00d00020): 0001003e // Rows
 L4 G3 R01 (00d000a0): 00000000 // Columns *
 L4 G3 R03 (00d001a0): 00000001 // Pooling rows
@@ -504,7 +465,7 @@ L4 G3 R05 (00d002a0): 00000001 // Stride
 L4 G3 R06 (00d00320): 00000800 // SRAM write ptr
 L4 G3 R07 (00d003a0): 00000000 // Write ptr time slot offs *
 L4 G3 R08 (00d00420): 00002000 // Write ptr mask offs
-L4 G3 R09 (00d004a0): 00000000 // Write ptr multi-pass channel offs *
+L4 G3 R09 (00d004a0): 00000001 // Write ptr multi-pass channel offs
 L4 G3 R10 (00d00520): 00000000 // SRAM read ptr *
 L4 G3 R11 (00d005a0): 00000ba0 // Layer control
 L4 G3 R20 (00d00a20): 0001f800 // Layer control 2
@@ -513,8 +474,6 @@ L4 G3 R02 (00d00120): 00001300 // 1D
 L4 G3 R13 (00d006a0): 00000000 // TRAM ptr max *
 L4 G3 R15 (00d007a0): 00022000 // Post processing register
 L4 G3 R14 (00d00720): 00000000 // Mask and processor enables *
-L4 G3 R16 (00d00820): 00000000 // Stream processing start *
-L4 G3 R17 (00d008a0): 00000000 // Stream processing delta *
 L5 G0 R00 (00100024): 0000001d // Rows
 L5 G0 R01 (001000a4): 00000000 // Columns *
 L5 G0 R03 (001001a4): 00000000 // Pooling rows *
@@ -532,8 +491,6 @@ L5 G0 R02 (00100124): 00001300 // 1D
 L5 G0 R13 (001006a4): 00000000 // TRAM ptr max *
 L5 G0 R15 (001007a4): 00022000 // Post processing register
 L5 G0 R14 (00100724): ffffffff // Mask and processor enables
-L5 G0 R16 (00100824): 00000000 // Stream processing start *
-L5 G0 R17 (001008a4): 00000000 // Stream processing delta *
 L5 G1 R00 (00500024): 0000001d // Rows
 L5 G1 R01 (005000a4): 00000000 // Columns *
 L5 G1 R03 (005001a4): 00000000 // Pooling rows *
@@ -551,8 +508,6 @@ L5 G1 R02 (00500124): 00001300 // 1D
 L5 G1 R13 (005006a4): 00000000 // TRAM ptr max *
 L5 G1 R15 (005007a4): 00022000 // Post processing register
 L5 G1 R14 (00500724): ffffffff // Mask and processor enables
-L5 G1 R16 (00500824): 00000000 // Stream processing start *
-L5 G1 R17 (005008a4): 00000000 // Stream processing delta *
 L5 G2 R00 (00900024): 0000001d // Rows
 L5 G2 R01 (009000a4): 00000000 // Columns *
 L5 G2 R03 (009001a4): 00000000 // Pooling rows *
@@ -570,8 +525,6 @@ L5 G2 R02 (00900124): 00001300 // 1D
 L5 G2 R13 (009006a4): 00000000 // TRAM ptr max *
 L5 G2 R15 (009007a4): 00022000 // Post processing register
 L5 G2 R14 (00900724): ffffffff // Mask and processor enables
-L5 G2 R16 (00900824): 00000000 // Stream processing start *
-L5 G2 R17 (009008a4): 00000000 // Stream processing delta *
 L5 G3 R00 (00d00024): 0000001d // Rows
 L5 G3 R01 (00d000a4): 00000000 // Columns *
 L5 G3 R03 (00d001a4): 00000000 // Pooling rows *
@@ -589,8 +542,6 @@ L5 G3 R02 (00d00124): 00001300 // 1D
 L5 G3 R13 (00d006a4): 00000000 // TRAM ptr max *
 L5 G3 R15 (00d007a4): 00022000 // Post processing register
 L5 G3 R14 (00d00724): ffffffff // Mask and processor enables
-L5 G3 R16 (00d00824): 00000000 // Stream processing start *
-L5 G3 R17 (00d008a4): 00000000 // Stream processing delta *
 L6 G0 R00 (00100028): 0001001d // Rows
 L6 G0 R01 (001000a8): 00000000 // Columns *
 L6 G0 R03 (001001a8): 00000001 // Pooling rows
@@ -608,8 +559,6 @@ L6 G0 R02 (00100128): 00001300 // 1D
 L6 G0 R13 (001006a8): 00000000 // TRAM ptr max *
 L6 G0 R15 (001007a8): 00000000 // Post processing register *
 L6 G0 R14 (00100728): ffffffff // Mask and processor enables
-L6 G0 R16 (00100828): 00000000 // Stream processing start *
-L6 G0 R17 (001008a8): 00000000 // Stream processing delta *
 L6 G1 R00 (00500028): 0001001d // Rows
 L6 G1 R01 (005000a8): 00000000 // Columns *
 L6 G1 R03 (005001a8): 00000001 // Pooling rows
@@ -627,8 +576,6 @@ L6 G1 R02 (00500128): 00001300 // 1D
 L6 G1 R13 (005006a8): 00000000 // TRAM ptr max *
 L6 G1 R15 (005007a8): 00000000 // Post processing register *
 L6 G1 R14 (00500728): ffffffff // Mask and processor enables
-L6 G1 R16 (00500828): 00000000 // Stream processing start *
-L6 G1 R17 (005008a8): 00000000 // Stream processing delta *
 L6 G2 R00 (00900028): 0001001d // Rows
 L6 G2 R01 (009000a8): 00000000 // Columns *
 L6 G2 R03 (009001a8): 00000001 // Pooling rows
@@ -646,8 +593,6 @@ L6 G2 R02 (00900128): 00001300 // 1D
 L6 G2 R13 (009006a8): 00000000 // TRAM ptr max *
 L6 G2 R15 (009007a8): 00000000 // Post processing register *
 L6 G2 R14 (00900728): ffffffff // Mask and processor enables
-L6 G2 R16 (00900828): 00000000 // Stream processing start *
-L6 G2 R17 (009008a8): 00000000 // Stream processing delta *
 L6 G3 R00 (00d00028): 0001001d // Rows
 L6 G3 R01 (00d000a8): 00000000 // Columns *
 L6 G3 R03 (00d001a8): 00000001 // Pooling rows
@@ -665,8 +610,6 @@ L6 G3 R02 (00d00128): 00001300 // 1D
 L6 G3 R13 (00d006a8): 00000000 // TRAM ptr max *
 L6 G3 R15 (00d007a8): 00000000 // Post processing register *
 L6 G3 R14 (00d00728): 00000000 // Mask and processor enables *
-L6 G3 R16 (00d00828): 00000000 // Stream processing start *
-L6 G3 R17 (00d008a8): 00000000 // Stream processing delta *
 L7 G0 R00 (0010002c): 0001000f // Rows
 L7 G0 R01 (001000ac): 00000000 // Columns *
 L7 G0 R03 (001001ac): 00000001 // Pooling rows
@@ -675,7 +618,7 @@ L7 G0 R05 (001002ac): 00000001 // Stride
 L7 G0 R06 (0010032c): 00000000 // SRAM write ptr *
 L7 G0 R07 (001003ac): 00000000 // Write ptr time slot offs *
 L7 G0 R08 (0010042c): 00002000 // Write ptr mask offs
-L7 G0 R09 (001004ac): 00000000 // Write ptr multi-pass channel offs *
+L7 G0 R09 (001004ac): 00000001 // Write ptr multi-pass channel offs
 L7 G0 R10 (0010052c): 00000800 // SRAM read ptr
 L7 G0 R11 (001005ac): 0000eba0 // Layer control
 L7 G0 R20 (00100a2c): 0001f801 // Layer control 2
@@ -684,8 +627,6 @@ L7 G0 R02 (0010012c): 00001600 // 1D
 L7 G0 R13 (001006ac): 00000000 // TRAM ptr max *
 L7 G0 R15 (001007ac): 00022000 // Post processing register
 L7 G0 R14 (0010072c): ffffffff // Mask and processor enables
-L7 G0 R16 (0010082c): 00000000 // Stream processing start *
-L7 G0 R17 (001008ac): 00000000 // Stream processing delta *
 L7 G1 R00 (0050002c): 0001000f // Rows
 L7 G1 R01 (005000ac): 00000000 // Columns *
 L7 G1 R03 (005001ac): 00000001 // Pooling rows
@@ -694,7 +635,7 @@ L7 G1 R05 (005002ac): 00000001 // Stride
 L7 G1 R06 (0050032c): 00000000 // SRAM write ptr *
 L7 G1 R07 (005003ac): 00000000 // Write ptr time slot offs *
 L7 G1 R08 (0050042c): 00002000 // Write ptr mask offs
-L7 G1 R09 (005004ac): 00000000 // Write ptr multi-pass channel offs *
+L7 G1 R09 (005004ac): 00000001 // Write ptr multi-pass channel offs
 L7 G1 R10 (0050052c): 00000800 // SRAM read ptr
 L7 G1 R11 (005005ac): 00000ba0 // Layer control
 L7 G1 R20 (00500a2c): 0001f801 // Layer control 2
@@ -703,8 +644,6 @@ L7 G1 R02 (0050012c): 00001600 // 1D
 L7 G1 R13 (005006ac): 00000000 // TRAM ptr max *
 L7 G1 R15 (005007ac): 00022000 // Post processing register
 L7 G1 R14 (0050072c): ffffffff // Mask and processor enables
-L7 G1 R16 (0050082c): 00000000 // Stream processing start *
-L7 G1 R17 (005008ac): 00000000 // Stream processing delta *
 L7 G2 R00 (0090002c): 0001000f // Rows
 L7 G2 R01 (009000ac): 00000000 // Columns *
 L7 G2 R03 (009001ac): 00000001 // Pooling rows
@@ -713,7 +652,7 @@ L7 G2 R05 (009002ac): 00000001 // Stride
 L7 G2 R06 (0090032c): 00000000 // SRAM write ptr *
 L7 G2 R07 (009003ac): 00000000 // Write ptr time slot offs *
 L7 G2 R08 (0090042c): 00002000 // Write ptr mask offs
-L7 G2 R09 (009004ac): 00000000 // Write ptr multi-pass channel offs *
+L7 G2 R09 (009004ac): 00000001 // Write ptr multi-pass channel offs
 L7 G2 R10 (0090052c): 00000800 // SRAM read ptr
 L7 G2 R11 (009005ac): 00000ba0 // Layer control
 L7 G2 R20 (00900a2c): 0001f801 // Layer control 2
@@ -722,8 +661,6 @@ L7 G2 R02 (0090012c): 00001600 // 1D
 L7 G2 R13 (009006ac): 00000000 // TRAM ptr max *
 L7 G2 R15 (009007ac): 00022000 // Post processing register
 L7 G2 R14 (0090072c): ffffffff // Mask and processor enables
-L7 G2 R16 (0090082c): 00000000 // Stream processing start *
-L7 G2 R17 (009008ac): 00000000 // Stream processing delta *
 L7 G3 R00 (00d0002c): 0001000f // Rows
 L7 G3 R01 (00d000ac): 00000000 // Columns *
 L7 G3 R03 (00d001ac): 00000001 // Pooling rows
@@ -732,7 +669,7 @@ L7 G3 R05 (00d002ac): 00000001 // Stride
 L7 G3 R06 (00d0032c): 00000000 // SRAM write ptr *
 L7 G3 R07 (00d003ac): 00000000 // Write ptr time slot offs *
 L7 G3 R08 (00d0042c): 00002000 // Write ptr mask offs
-L7 G3 R09 (00d004ac): 00000000 // Write ptr multi-pass channel offs *
+L7 G3 R09 (00d004ac): 00000001 // Write ptr multi-pass channel offs
 L7 G3 R10 (00d0052c): 00000800 // SRAM read ptr
 L7 G3 R11 (00d005ac): 00000ba0 // Layer control
 L7 G3 R20 (00d00a2c): 0001f801 // Layer control 2
@@ -741,8 +678,6 @@ L7 G3 R02 (00d0012c): 00001600 // 1D
 L7 G3 R13 (00d006ac): 00000000 // TRAM ptr max *
 L7 G3 R15 (00d007ac): 00022000 // Post processing register
 L7 G3 R14 (00d0072c): 000f000f // Mask and processor enables
-L7 G3 R16 (00d0082c): 00000000 // Stream processing start *
-L7 G3 R17 (00d008ac): 00000000 // Stream processing delta *
 L8 G0 R00 (00100030): 00000000 // Rows *
 L8 G0 R01 (001000b0): 00000000 // Columns *
 L8 G0 R03 (001001b0): 00000000 // Pooling rows *
@@ -751,7 +686,7 @@ L8 G0 R05 (001002b0): 00000000 // Stride *
 L8 G0 R06 (00100330): 00000800 // SRAM write ptr
 L8 G0 R07 (001003b0): 00000001 // Write ptr time slot offs
 L8 G0 R08 (00100430): 00002000 // Write ptr mask offs
-L8 G0 R09 (001004b0): 00000000 // Write ptr multi-pass channel offs *
+L8 G0 R09 (001004b0): 00000004 // Write ptr multi-pass channel offs
 L8 G0 R10 (00100530): 00000000 // SRAM read ptr *
 L8 G0 R11 (001005b0): 0001e920 // Layer control
 L8 G0 R20 (00100a30): 0000a003 // Layer control 2
@@ -760,8 +695,6 @@ L8 G0 R02 (00100130): 00000100 // 1D
 L8 G0 R13 (001006b0): 00000000 // TRAM ptr max *
 L8 G0 R15 (001007b0): 00000000 // Post processing register *
 L8 G0 R14 (00100730): ffffffff // Mask and processor enables
-L8 G0 R16 (00100830): 00000000 // Stream processing start *
-L8 G0 R17 (001008b0): 00000000 // Stream processing delta *
 L8 G1 R00 (00500030): 00000000 // Rows *
 L8 G1 R01 (005000b0): 00000000 // Columns *
 L8 G1 R03 (005001b0): 00000000 // Pooling rows *
@@ -770,7 +703,7 @@ L8 G1 R05 (005002b0): 00000000 // Stride *
 L8 G1 R06 (00500330): 00000800 // SRAM write ptr
 L8 G1 R07 (005003b0): 00000001 // Write ptr time slot offs
 L8 G1 R08 (00500430): 00002000 // Write ptr mask offs
-L8 G1 R09 (005004b0): 00000000 // Write ptr multi-pass channel offs *
+L8 G1 R09 (005004b0): 00000004 // Write ptr multi-pass channel offs
 L8 G1 R10 (00500530): 00000000 // SRAM read ptr *
 L8 G1 R11 (005005b0): 00010920 // Layer control
 L8 G1 R20 (00500a30): 0000a003 // Layer control 2
@@ -779,8 +712,6 @@ L8 G1 R02 (00500130): 00000100 // 1D
 L8 G1 R13 (005006b0): 00000000 // TRAM ptr max *
 L8 G1 R15 (005007b0): 00000000 // Post processing register *
 L8 G1 R14 (00500730): ffffffff // Mask and processor enables
-L8 G1 R16 (00500830): 00000000 // Stream processing start *
-L8 G1 R17 (005008b0): 00000000 // Stream processing delta *
 L8 G2 R00 (00900030): 00000000 // Rows *
 L8 G2 R01 (009000b0): 00000000 // Columns *
 L8 G2 R03 (009001b0): 00000000 // Pooling rows *
@@ -789,7 +720,7 @@ L8 G2 R05 (009002b0): 00000000 // Stride *
 L8 G2 R06 (00900330): 00000800 // SRAM write ptr
 L8 G2 R07 (009003b0): 00000001 // Write ptr time slot offs
 L8 G2 R08 (00900430): 00002000 // Write ptr mask offs
-L8 G2 R09 (009004b0): 00000000 // Write ptr multi-pass channel offs *
+L8 G2 R09 (009004b0): 00000004 // Write ptr multi-pass channel offs
 L8 G2 R10 (00900530): 00000000 // SRAM read ptr *
 L8 G2 R11 (009005b0): 00010920 // Layer control
 L8 G2 R20 (00900a30): 0000a003 // Layer control 2
@@ -798,8 +729,6 @@ L8 G2 R02 (00900130): 00000100 // 1D
 L8 G2 R13 (009006b0): 00000000 // TRAM ptr max *
 L8 G2 R15 (009007b0): 00000000 // Post processing register *
 L8 G2 R14 (00900730): ffffffff // Mask and processor enables
-L8 G2 R16 (00900830): 00000000 // Stream processing start *
-L8 G2 R17 (009008b0): 00000000 // Stream processing delta *
 L8 G3 R00 (00d00030): 00000000 // Rows *
 L8 G3 R01 (00d000b0): 00000000 // Columns *
 L8 G3 R03 (00d001b0): 00000000 // Pooling rows *
@@ -808,7 +737,7 @@ L8 G3 R05 (00d002b0): 00000000 // Stride *
 L8 G3 R06 (00d00330): 00000800 // SRAM write ptr
 L8 G3 R07 (00d003b0): 00000001 // Write ptr time slot offs
 L8 G3 R08 (00d00430): 00002000 // Write ptr mask offs
-L8 G3 R09 (00d004b0): 00000000 // Write ptr multi-pass channel offs *
+L8 G3 R09 (00d004b0): 00000004 // Write ptr multi-pass channel offs
 L8 G3 R10 (00d00530): 00000000 // SRAM read ptr *
 L8 G3 R11 (00d005b0): 00010920 // Layer control
 L8 G3 R20 (00d00a30): 0000a003 // Layer control 2
@@ -817,16 +746,14 @@ L8 G3 R02 (00d00130): 00000100 // 1D
 L8 G3 R13 (00d006b0): 00000000 // TRAM ptr max *
 L8 G3 R15 (00d007b0): 00000000 // Post processing register *
 L8 G3 R14 (00d00730): ffffffff // Mask and processor enables
-L8 G3 R16 (00d00830): 00000000 // Stream processing start *
-L8 G3 R17 (00d008b0): 00000000 // Stream processing delta *
 
 Global registers:
 -----------------
-R00   (00100000): 00100808 // Enable quadrant 0
-R00   (00500000): 00100809 // Enable quadrant 1
-R00   (00900000): 00100809 // Enable quadrant 2
-R00   (00d00000): 00100809 // Enable quadrant 3
-R00   (00100000): 00100009 // Master enable quadrant 0
+R00   (00100000): 00100808 // Enable group 0
+R00   (00500000): 00100809 // Enable group 1
+R00   (00900000): 00100809 // Enable group 2
+R00   (00d00000): 00100809 // Enable group 3
+R00   (00100000): 00100009 // Master enable group 0
 
 LAYER 0 (CONV1D)...
 
@@ -26872,7 +26799,7 @@ LAYER 2 (CONV1D)...
     0   0   0   0   7   3   3   0   0   0  16   0   0   0  17   0   0   0   0   0   0   0   0   0   0   0   0   0   0  21   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
     0   1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]]
 
-MAX POOL 2 WITH STRIDE 2 (96, 126) -> [96, 63]:
+2 MAX POOLING, STRIDE 2 (96, 126) -> [96, 63]:
 [[  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0   0
     0   0   0   1   0   0   0   0   0   0   0   0   0   0   0   0   0]
  [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   1   0   0   0   0   0   0   0   0  13   0  10  10  23  45   0   0   0  11   0   0   0   0
@@ -37426,7 +37353,7 @@ LAYER 4 (CONV1D)...
  [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   4   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
     0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]]
 
-MAX POOL 2 WITH STRIDE 2 (48, 61) -> [48, 30]:
+2 MAX POOLING, STRIDE 2 (48, 61) -> [48, 30]:
 [[  0   0   0   0   0   0   0   0   0   0   0   0  11  18  22  18   6   0  40  48  37  24  19  14   1   0   0   0   0   0]
  [  0   0   0   0   0   0   0   0   0   0   8  17   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
  [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0]
@@ -47676,7 +47603,7 @@ LAYER 6 (CONV1D)...
  [  0   0   0   0   0   0   0   0   0   0   0   0   0   0   0  52  74  66  50   3   0   2   4   0   2   0   0   0]
  [  0   0   0   0   0   0   0   2   2   0   0   0   0   0   0   0   0   0   0   0   0   0   0   6   0   0   0   0]]
 
-AVERAGE POOL 2 WITH STRIDE 2 (96, 28) -> [96, 14]:
+2 AVERAGE POOLING, STRIDE 2 (96, 28) -> [96, 14]:
 [[ 0  0  0  2 16  0  0  0  0  0  0  0  0  0]
  [ 0  0  0  0  7 32 12  0  0  0  3  0  0  0]
  [ 0  0  0  0  0  0  0  0  0  8 14 25  0  0]
@@ -57886,7 +57813,7 @@ LAYER 7 (CONV1D)...
  [  0   0   0   0   0   0   0   0   0   0   0   0   0   0]
  [  0   0   3   0  42  75  39   0   0   0   0   0   0   0]]
 
-MAX POOL 2 WITH STRIDE 2 (100, 14) -> [100, 7]:
+2 MAX POOLING, STRIDE 2 (100, 14) -> [100, 7]:
 [[  0   0   0   0   0   0   0]
  [  0   0   0   0   0   0   0]
  [  0   0   9  17   0   0   0]
@@ -64652,7 +64579,7 @@ BIAS: None
  [  0   0 127 127]
  [  0 127 127 127]]
 
-LAYER 8 (LINEAR)...
+LAYER 8 (CONV2D)...
 
 64x4x1 INPUT DATA:
 Channel #0
@@ -65161,15 +65088,6 @@ BIAS: None
 
 SUMMARY OF OPS
 Hardware: 8,402,528 ops (8,345,344 macc; 54,496 comp; 2,688 add; 0 mul; 0 bitwise)
-  Layer 0: 1,651,200 ops (1,638,400 macc; 12,800 comp; 0 add; 0 mul; 0 bitwise)
-  Layer 1: 3,640,896 ops (3,628,800 macc; 12,096 comp; 0 add; 0 mul; 0 bitwise)
-  Layer 2: 1,177,344 ops (1,161,216 macc; 16,128 comp; 0 add; 0 mul; 0 bitwise)
-  Layer 3: 565,104 ops (562,176 macc; 2,928 comp; 0 add; 0 mul; 0 bitwise)
-  Layer 4: 281,280 ops (276,480 macc; 4,800 comp; 0 add; 0 mul; 0 bitwise)
-  Layer 5: 518,784 ops (516,096 macc; 2,688 comp; 0 add; 0 mul; 0 bitwise)
-  Layer 6: 407,288 ops (403,200 macc; 1,400 comp; 2,688 add; 0 mul; 0 bitwise)
-  Layer 7: 155,256 ops (153,600 macc; 1,656 comp; 0 add; 0 mul; 0 bitwise)
-  Layer 8: 5,376 ops (5,376 macc; 0 comp; 0 add; 0 mul; 0 bitwise)
 
 RESOURCE USAGE
 Weight memory: 169,472 bytes out of 442,368 bytes total (38%)

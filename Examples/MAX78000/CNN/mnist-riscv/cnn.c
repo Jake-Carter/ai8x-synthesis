@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All rights Reserved.
+* Copyright (C) 2020-2021 Maxim Integrated Products, Inc., All rights Reserved.
 *
 * This software is protected by copyright laws of the United States and
 * of foreign countries. This material may also be protected by patent laws
@@ -33,16 +33,16 @@
 *******************************************************************************/
 
 // mnist-riscv
-// Created using ai8xize.py --test-dir Examples/MAX78000/CNN --prefix mnist-riscv --checkpoint-file trained/ai85-mnist-qat8-q.pth.tar --config-file networks/mnist-chw-ai85.yaml --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint --verbose --riscv --riscv-debug
+// Created using ./ai8xize.py --verbose --log --test-dir sdk/Examples/MAX78000/CNN --prefix mnist-riscv --checkpoint-file trained/ai85-mnist-qat8-q.pth.tar --config-file networks/mnist-chw-ai85.yaml --softmax --device MAX78000 --compact-data --mexpress --timer 0 --display-checkpoint --riscv --riscv-debug
 
 // DO NOT EDIT - regenerate this file instead!
 
 // Configuring 5 layers:
-// Layer 0: 1x28x28 (CHW data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 60x28x28 output
-// Layer 1: 60x28x28 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 2/2, ReLU, 60x16x16 output
-// Layer 2: 60x16x16 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 56x8x8 output
-// Layer 3: 56x8x8 (HWC data), avg pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 12x4x4 output
-// Layer 4: 12x4x4 (flattened to 192x1x1, HWC data), no pooling, linear with kernel size 1x1, stride 1/1, pad 0/0, no activation, 10x1x1 output
+// Layer 0: 1x28x28 (CHW data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, 60x28x28 output
+// Layer 1: 60x28x28 (HWC data), 2x2 max pool with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 2/2, 60x16x16 output
+// Layer 2: 60x16x16 (HWC data), 2x2 max pool with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, 56x8x8 output
+// Layer 3: 56x8x8 (HWC data), 2x2 avg pool with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, 12x4x4 output
+// Layer 4: 12x4x4 (flattened HWC data), no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, 10x1x1 output
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -55,7 +55,7 @@
 
 void __attribute__((interrupt("machine"))) CNN_IRQHandler(void)
 {
-  // Acknowledge interrupt to all quadrants
+  // Acknowledge interrupt to all groups
   *((volatile uint32_t *) 0x50100000) &= ~((1<<12) | 1);
   *((volatile uint32_t *) 0x50500000) &= ~((1<<12) | 1);
   *((volatile uint32_t *) 0x50900000) &= ~((1<<12) | 1);
@@ -76,14 +76,14 @@ int cnn_continue(void)
 {
   cnn_time = 0;
 
-  *((volatile uint32_t *) 0x50100000) |= 1; // Re-enable quadrant 0
+  *((volatile uint32_t *) 0x50100000) |= 1; // Re-enable group 0
 
   return CNN_OK;
 }
 
 int cnn_stop(void)
 {
-  *((volatile uint32_t *) 0x50100000) &= ~1; // Disable quadrant 0
+  *((volatile uint32_t *) 0x50100000) &= ~1; // Disable group 0
 
   return CNN_OK;
 }
@@ -332,7 +332,7 @@ int cnn_init(void)
 
 int cnn_configure(void)
 {
-  // Layer 0 quadrant 0
+  // Layer 0 group 0
   *((volatile uint32_t *) 0x50100010) = 0x0001001d; // Rows
   *((volatile uint32_t *) 0x50100090) = 0x0001001d; // Columns
   *((volatile uint32_t *) 0x50100310) = 0x00002800; // SRAM write ptr
@@ -344,7 +344,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50100790) = 0x00022000; // Post processing register
   *((volatile uint32_t *) 0x50100710) = 0x00010001; // Mask and processor enables
 
-  // Layer 0 quadrant 1
+  // Layer 0 group 1
   *((volatile uint32_t *) 0x50500010) = 0x0001001d; // Rows
   *((volatile uint32_t *) 0x50500090) = 0x0001001d; // Columns
   *((volatile uint32_t *) 0x50500310) = 0x00002800; // SRAM write ptr
@@ -355,7 +355,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50500690) = 0x0000001b; // TRAM ptr max
   *((volatile uint32_t *) 0x50500790) = 0x00022000; // Post processing register
 
-  // Layer 0 quadrant 2
+  // Layer 0 group 2
   *((volatile uint32_t *) 0x50900010) = 0x0001001d; // Rows
   *((volatile uint32_t *) 0x50900090) = 0x0001001d; // Columns
   *((volatile uint32_t *) 0x50900310) = 0x00002800; // SRAM write ptr
@@ -366,7 +366,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50900690) = 0x0000001b; // TRAM ptr max
   *((volatile uint32_t *) 0x50900790) = 0x00022000; // Post processing register
 
-  // Layer 0 quadrant 3
+  // Layer 0 group 3
   *((volatile uint32_t *) 0x50d00010) = 0x0001001d; // Rows
   *((volatile uint32_t *) 0x50d00090) = 0x0001001d; // Columns
   *((volatile uint32_t *) 0x50d00310) = 0x00002800; // SRAM write ptr
@@ -377,7 +377,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50d00690) = 0x0000001b; // TRAM ptr max
   *((volatile uint32_t *) 0x50d00790) = 0x00022000; // Post processing register
 
-  // Layer 1 quadrant 0
+  // Layer 1 group 0
   *((volatile uint32_t *) 0x50100014) = 0x0002001f; // Rows
   *((volatile uint32_t *) 0x50100094) = 0x0002001f; // Columns
   *((volatile uint32_t *) 0x50100194) = 0x00000001; // Pooling rows
@@ -393,7 +393,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50100794) = 0x00024000; // Post processing register
   *((volatile uint32_t *) 0x50100714) = 0xfff0fff0; // Mask and processor enables
 
-  // Layer 1 quadrant 1
+  // Layer 1 group 1
   *((volatile uint32_t *) 0x50500014) = 0x0002001f; // Rows
   *((volatile uint32_t *) 0x50500094) = 0x0002001f; // Columns
   *((volatile uint32_t *) 0x50500194) = 0x00000001; // Pooling rows
@@ -409,7 +409,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50500794) = 0x00024000; // Post processing register
   *((volatile uint32_t *) 0x50500714) = 0xffffffff; // Mask and processor enables
 
-  // Layer 1 quadrant 2
+  // Layer 1 group 2
   *((volatile uint32_t *) 0x50900014) = 0x0002001f; // Rows
   *((volatile uint32_t *) 0x50900094) = 0x0002001f; // Columns
   *((volatile uint32_t *) 0x50900194) = 0x00000001; // Pooling rows
@@ -425,7 +425,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50900794) = 0x00024000; // Post processing register
   *((volatile uint32_t *) 0x50900714) = 0xffffffff; // Mask and processor enables
 
-  // Layer 1 quadrant 3
+  // Layer 1 group 3
   *((volatile uint32_t *) 0x50d00014) = 0x0002001f; // Rows
   *((volatile uint32_t *) 0x50d00094) = 0x0002001f; // Columns
   *((volatile uint32_t *) 0x50d00194) = 0x00000001; // Pooling rows
@@ -441,7 +441,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50d00794) = 0x00024000; // Post processing register
   *((volatile uint32_t *) 0x50d00714) = 0xffffffff; // Mask and processor enables
 
-  // Layer 2 quadrant 0
+  // Layer 2 group 0
   *((volatile uint32_t *) 0x50100018) = 0x00010011; // Rows
   *((volatile uint32_t *) 0x50100098) = 0x00010011; // Columns
   *((volatile uint32_t *) 0x50100198) = 0x00000001; // Pooling rows
@@ -456,7 +456,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50100798) = 0x00024000; // Post processing register
   *((volatile uint32_t *) 0x50100718) = 0xfff0fff0; // Mask and processor enables
 
-  // Layer 2 quadrant 1
+  // Layer 2 group 1
   *((volatile uint32_t *) 0x50500018) = 0x00010011; // Rows
   *((volatile uint32_t *) 0x50500098) = 0x00010011; // Columns
   *((volatile uint32_t *) 0x50500198) = 0x00000001; // Pooling rows
@@ -471,7 +471,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50500798) = 0x00024000; // Post processing register
   *((volatile uint32_t *) 0x50500718) = 0xffffffff; // Mask and processor enables
 
-  // Layer 2 quadrant 2
+  // Layer 2 group 2
   *((volatile uint32_t *) 0x50900018) = 0x00010011; // Rows
   *((volatile uint32_t *) 0x50900098) = 0x00010011; // Columns
   *((volatile uint32_t *) 0x50900198) = 0x00000001; // Pooling rows
@@ -486,7 +486,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50900798) = 0x00024000; // Post processing register
   *((volatile uint32_t *) 0x50900718) = 0xffffffff; // Mask and processor enables
 
-  // Layer 2 quadrant 3
+  // Layer 2 group 3
   *((volatile uint32_t *) 0x50d00018) = 0x00010011; // Rows
   *((volatile uint32_t *) 0x50d00098) = 0x00010011; // Columns
   *((volatile uint32_t *) 0x50d00198) = 0x00000001; // Pooling rows
@@ -501,7 +501,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50d00798) = 0x00024000; // Post processing register
   *((volatile uint32_t *) 0x50d00718) = 0xffffffff; // Mask and processor enables
 
-  // Layer 3 quadrant 0
+  // Layer 3 group 0
   *((volatile uint32_t *) 0x5010001c) = 0x00010009; // Rows
   *((volatile uint32_t *) 0x5010009c) = 0x00010009; // Columns
   *((volatile uint32_t *) 0x5010019c) = 0x00000001; // Pooling rows
@@ -516,7 +516,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x5010079c) = 0x00022000; // Post processing register
   *((volatile uint32_t *) 0x5010071c) = 0xfff0fff0; // Mask and processor enables
 
-  // Layer 3 quadrant 1
+  // Layer 3 group 1
   *((volatile uint32_t *) 0x5050001c) = 0x00010009; // Rows
   *((volatile uint32_t *) 0x5050009c) = 0x00010009; // Columns
   *((volatile uint32_t *) 0x5050019c) = 0x00000001; // Pooling rows
@@ -531,7 +531,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x5050079c) = 0x00022000; // Post processing register
   *((volatile uint32_t *) 0x5050071c) = 0xffffffff; // Mask and processor enables
 
-  // Layer 3 quadrant 2
+  // Layer 3 group 2
   *((volatile uint32_t *) 0x5090001c) = 0x00010009; // Rows
   *((volatile uint32_t *) 0x5090009c) = 0x00010009; // Columns
   *((volatile uint32_t *) 0x5090019c) = 0x00000001; // Pooling rows
@@ -546,7 +546,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x5090079c) = 0x00022000; // Post processing register
   *((volatile uint32_t *) 0x5090071c) = 0xffffffff; // Mask and processor enables
 
-  // Layer 3 quadrant 3
+  // Layer 3 group 3
   *((volatile uint32_t *) 0x50d0001c) = 0x00010009; // Rows
   *((volatile uint32_t *) 0x50d0009c) = 0x00010009; // Columns
   *((volatile uint32_t *) 0x50d0019c) = 0x00000001; // Pooling rows
@@ -561,7 +561,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50d0079c) = 0x00022000; // Post processing register
   *((volatile uint32_t *) 0x50d0071c) = 0x0fff0fff; // Mask and processor enables
 
-  // Layer 4 quadrant 0
+  // Layer 4 group 0
   *((volatile uint32_t *) 0x50100320) = 0x00000400; // SRAM write ptr
   *((volatile uint32_t *) 0x501003a0) = 0x00000001; // Write ptr time slot offs
   *((volatile uint32_t *) 0x50100420) = 0x00002000; // Write ptr mask offs
@@ -572,7 +572,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x501007a0) = 0x00001000; // Post processing register
   *((volatile uint32_t *) 0x50100720) = 0x0fff0fff; // Mask and processor enables
 
-  // Layer 4 quadrant 1
+  // Layer 4 group 1
   *((volatile uint32_t *) 0x50500320) = 0x00000400; // SRAM write ptr
   *((volatile uint32_t *) 0x505003a0) = 0x00000001; // Write ptr time slot offs
   *((volatile uint32_t *) 0x50500420) = 0x00002000; // Write ptr mask offs
@@ -581,7 +581,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50500620) = 0x240028f8; // Mask offset and count
   *((volatile uint32_t *) 0x50500120) = 0x00000100; // 1D
 
-  // Layer 4 quadrant 2
+  // Layer 4 group 2
   *((volatile uint32_t *) 0x50900320) = 0x00000400; // SRAM write ptr
   *((volatile uint32_t *) 0x509003a0) = 0x00000001; // Write ptr time slot offs
   *((volatile uint32_t *) 0x50900420) = 0x00002000; // Write ptr mask offs
@@ -590,7 +590,7 @@ int cnn_configure(void)
   *((volatile uint32_t *) 0x50900620) = 0x240028f8; // Mask offset and count
   *((volatile uint32_t *) 0x50900120) = 0x00000100; // 1D
 
-  // Layer 4 quadrant 3
+  // Layer 4 group 3
   *((volatile uint32_t *) 0x50d00320) = 0x00000400; // SRAM write ptr
   *((volatile uint32_t *) 0x50d003a0) = 0x00000001; // Write ptr time slot offs
   *((volatile uint32_t *) 0x50d00420) = 0x00002000; // Write ptr mask offs
@@ -607,17 +607,17 @@ int cnn_start(void)
 {
   cnn_time = 0;
 
-  *((volatile uint32_t *) 0x50100000) = 0x00100808; // Enable quadrant 0
-  *((volatile uint32_t *) 0x50500000) = 0x00100809; // Enable quadrant 1
-  *((volatile uint32_t *) 0x50900000) = 0x00100809; // Enable quadrant 2
-  *((volatile uint32_t *) 0x50d00000) = 0x00100809; // Enable quadrant 3
+  *((volatile uint32_t *) 0x50100000) = 0x00100808; // Enable group 0
+  *((volatile uint32_t *) 0x50500000) = 0x00100809; // Enable group 1
+  *((volatile uint32_t *) 0x50900000) = 0x00100809; // Enable group 2
+  *((volatile uint32_t *) 0x50d00000) = 0x00100809; // Enable group 3
 
 #ifdef CNN_INFERENCE_TIMER
   MXC_TMR_SW_Start(CNN_INFERENCE_TIMER);
 #endif
 
   CNN_START; // Allow capture of processing time
-  *((volatile uint32_t *) 0x50100000) = 0x00100009; // Master enable quadrant 0
+  *((volatile uint32_t *) 0x50100000) = 0x00100009; // Master enable group 0
 
   return CNN_OK;
 }
@@ -626,7 +626,6 @@ int cnn_start(void)
 int cnn_unload(uint32_t *out_buf)
 {
   volatile uint32_t *addr;
-
   addr = (volatile uint32_t *) 0x50401000;
   *out_buf++ = *addr++;
   *out_buf++ = *addr++;
@@ -686,7 +685,7 @@ int cnn_boost_disable(mxc_gpio_regs_t *port, uint32_t pin)
   gpio_out.pad = MXC_GPIO_PAD_NONE;
   gpio_out.func = MXC_GPIO_FUNC_OUT;
   MXC_GPIO_Config(&gpio_out);
-  MXC_GPIO_OutClr(gpio_out.port, gpio_out.mask);
+  MXC_GPIO_OutSet(gpio_out.port, gpio_out.mask);
 
   return CNN_OK;
 }
@@ -698,9 +697,9 @@ int cnn_disable(void)
 
   // Disable power to CNN
   MXC_GCFR->reg3 = 0xf; // Reset
-  MXC_GCFR->reg2 = 0xf; // Iso
-  MXC_GCFR->reg0 = 0x0; // Power
   MXC_GCFR->reg1 = 0x0; // Mask memory
+  MXC_GCFR->reg0 = 0x0; // Power
+  MXC_GCFR->reg2 = 0xf; // Iso
   MXC_GCFR->reg3 = 0x0; // Reset
 
   return CNN_OK;
