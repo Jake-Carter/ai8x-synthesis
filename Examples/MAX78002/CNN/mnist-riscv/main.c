@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All rights Reserved.
+* Copyright (C) 2019-2022 Maxim Integrated Products, Inc., All rights Reserved.
 *
 * This software is protected by copyright laws of the United States and
 * of foreign countries. This material may also be protected by patent laws
@@ -34,7 +34,7 @@
 
 // ARM wrapper code
 // mnist-riscv
-// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix mnist-riscv --checkpoint-file trained/ai85-mnist-qat8-q.pth.tar --config-file networks/mnist-chw-ai85.yaml --softmax --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose --riscv --riscv-debug
+// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix mnist-riscv --checkpoint-file trained/ai85-mnist-qat8-q.pth.tar --config-file networks/mnist-chw-ai85.yaml --softmax --overwrite --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose --riscv --riscv-debug
 
 #include <assert.h>
 #include <stdlib.h>
@@ -43,6 +43,10 @@
 #include "gcfr_regs.h"
 #include "fcr_regs.h"
 #include "sema_regs.h"
+#define ipll_ctrl ito_ctrl
+#define MXC_F_GCR_IPLL_CTRL_EN MXC_F_GCR_ITO_CTRL_EN
+#define MXC_F_GCR_IPLL_CTRL_RDY MXC_F_GCR_ITO_CTRL_RDY
+#define MXC_S_GCR_PCLKDIV_CNNCLKSEL_IPLL MXC_S_GCR_PCLKDIV_CNNCLKSEL_ITO
 
 extern volatile void const *__FlashStart_; // Defined in linker file
 
@@ -57,7 +61,7 @@ int main(void)
 
   // Switch to 100 MHz clock
   MXC_SYS_Clock_Select(MXC_SYS_CLOCK_IPO);
-  MXC_GCR->ito_ctrl |= MXC_F_GCR_ITO_CTRL_EN; // Enable PLL (ITO)
+  MXC_GCR->ipll_ctrl |= MXC_F_GCR_IPLL_CTRL_EN; // Enable IPLL
   SystemCoreClockUpdate();
 
   MXC_FCR->urvbootaddr = (uint32_t) &__FlashStart_; // Set RISC-V boot address

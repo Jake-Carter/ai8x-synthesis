@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All rights Reserved.
+* Copyright (C) 2019-2022 Maxim Integrated Products, Inc., All rights Reserved.
 *
 * This software is protected by copyright laws of the United States and
 * of foreign countries. This material may also be protected by patent laws
@@ -33,16 +33,17 @@
 *******************************************************************************/
 
 // mnist
-// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix mnist --checkpoint-file trained/ai85-mnist-qat8-q.pth.tar --config-file networks/mnist-chw-ai85.yaml --softmax --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
+// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix mnist --checkpoint-file trained/ai85-mnist-qat8-q.pth.tar --config-file networks/mnist-chw-ai85.yaml --softmax --overwrite --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
 
 // DO NOT EDIT - regenerate this file instead!
 
-// Configuring 5 layers:
-// Layer 0: 1x28x28 (CHW data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 60x28x28 output
-// Layer 1: 60x28x28 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 2/2, ReLU, 60x16x16 output
-// Layer 2: 60x16x16 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 56x8x8 output
-// Layer 3: 56x8x8 (HWC data), avg pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 12x4x4 output
-// Layer 4: 12x4x4 (flattened to 192x1x1, HWC data), no pooling, linear with kernel size 1x1, stride 1/1, pad 0/0, no activation, 10x1x1 output
+// Configuring 5 layers
+// Input data: CHW
+// Layer 0: 1x28x28, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 60x28x28 output
+// Layer 1: 60x28x28, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 2/2, ReLU, 60x16x16 output
+// Layer 2: 60x16x16, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 56x8x8 output
+// Layer 3: 56x8x8, avg pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 12x4x4 output
+// Layer 4: 12x4x4flattened to 192x1x1, , no pooling, linear with kernel size 1x1, stride 1/1, pad 0/0, no activation, 10x1x1 output
 
 #include <assert.h>
 #include <stdlib.h>
@@ -539,8 +540,8 @@ int cnn_enable(uint32_t clock_source, uint32_t clock_divider)
   MXC_GCFR->reg2 = 0x0; // Iso
   MXC_GCFR->reg3 = 0x0; // Reset
 
-  if (clock_source == MXC_S_GCR_PCLKDIV_CNNCLKSEL_ITO)
-    while ((MXC_GCR->ito_ctrl & MXC_F_GCR_ITO_CTRL_RDY) != MXC_F_GCR_ITO_CTRL_RDY) ; // Wait for PLL
+  if (clock_source == MXC_S_GCR_PCLKDIV_CNNCLKSEL_IPLL)
+    while ((MXC_GCR->ipll_ctrl & MXC_F_GCR_IPLL_CTRL_RDY) != MXC_F_GCR_IPLL_CTRL_RDY) ; // Wait for PLL
 
   MXC_GCR->pclkdiv = (MXC_GCR->pclkdiv & ~(MXC_F_GCR_PCLKDIV_CNNCLKDIV | MXC_F_GCR_PCLKDIV_CNNCLKSEL))
                      | clock_divider | clock_source;

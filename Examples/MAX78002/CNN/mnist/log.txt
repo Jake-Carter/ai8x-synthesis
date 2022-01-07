@@ -1,4 +1,4 @@
-ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix mnist --checkpoint-file trained/ai85-mnist-qat8-q.pth.tar --config-file networks/mnist-chw-ai85.yaml --softmax --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
+ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix mnist --checkpoint-file trained/ai85-mnist-qat8-q.pth.tar --config-file networks/mnist-chw-ai85.yaml --softmax --overwrite --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
 MAX78002
 
 mnist

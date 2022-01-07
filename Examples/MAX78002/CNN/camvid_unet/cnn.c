@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All rights Reserved.
+* Copyright (C) 2019-2022 Maxim Integrated Products, Inc., All rights Reserved.
 *
 * This software is protected by copyright laws of the United States and
 * of foreign countries. This material may also be protected by patent laws
@@ -33,30 +33,31 @@
 *******************************************************************************/
 
 // camvid_unet
-// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix camvid_unet --checkpoint-file trained/ai85-camvid-unet-large-fakept-q.pth.tar --config-file networks/camvid-unet-large-fakept.yaml --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose --overlap-data --mlator --no-unload --max-checklines 8192
+// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix camvid_unet --checkpoint-file trained/ai85-camvid-unet-large-fakept-q.pth.tar --config-file networks/camvid-unet-large-fakept.yaml --overwrite --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose --overlap-data --mlator --no-unload --max-checklines 8192
 
 // DO NOT EDIT - regenerate this file instead!
 
-// Configuring 19 layers:
-// Layer 0: 48x48x48 (HWC data), no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 64x48x48 output
-// Layer 1: 64x48x48 (HWC data), no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 64x48x48 output
-// Layer 2: 64x48x48 (HWC data), no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 32x48x48 output
-// Layer 3: 32x48x48 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 8x48x48 output
-// Layer 4: 8x48x48 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 28x24x24 output
-// Layer 5: 28x24x24 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 56x12x12 output
-// Layer 6: 56x12x12 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 112x6x6 output
-// Layer 7: 56x12x12 (HWC data), no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, no activation, 56x12x12 output
-// Layer 8: 112x6x6 (HWC data), no pooling, convtranspose2d with kernel size 3x3, stride 2/2, pad 1/1, no activation, 56x12x12 output
-// Layer 9: 112x12x12 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 56x12x12 output
-// Layer 10: 56x12x12 (HWC data), no pooling, convtranspose2d with kernel size 3x3, stride 2/2, pad 1/1, no activation, 28x24x24 output
-// Layer 11: 56x24x24 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 28x24x24 output
-// Layer 12: 28x24x24 (HWC data), no pooling, convtranspose2d with kernel size 3x3, stride 2/2, pad 1/1, no activation, 8x48x48 output
-// Layer 13: 16x48x48 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 48x48x48 output
-// Layer 14: 48x48x48 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 64x48x48 output
-// Layer 15: 64x48x48 (HWC data), no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 64x48x48 output
-// Layer 16: 64x48x48 (HWC data), no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 64x48x48 output
-// Layer 17: 64x48x48 (HWC data), no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, no activation, 64x48x48 output
-// Layer 18: 64x48x48 (HWC data), no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, no activation, 64x48x48 output
+// Configuring 19 layers
+// Input data: HWC
+// Layer 0: 48x48x48, no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 64x48x48 output
+// Layer 1: 64x48x48, no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 64x48x48 output
+// Layer 2: 64x48x48, no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 32x48x48 output
+// Layer 3: 32x48x48, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 8x48x48 output
+// Layer 4: 8x48x48, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 28x24x24 output
+// Layer 5: 28x24x24, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 56x12x12 output
+// Layer 6: 56x12x12, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 112x6x6 output
+// Layer 7: 56x12x12, no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, no activation, 56x12x12 output
+// Layer 8: 112x6x6, no pooling, convtranspose2d with kernel size 3x3, stride 2/2, pad 1/1, no activation, 56x12x12 output
+// Layer 9: 112x12x12, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 56x12x12 output
+// Layer 10: 56x12x12, no pooling, convtranspose2d with kernel size 3x3, stride 2/2, pad 1/1, no activation, 28x24x24 output
+// Layer 11: 56x24x24, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 28x24x24 output
+// Layer 12: 28x24x24, no pooling, convtranspose2d with kernel size 3x3, stride 2/2, pad 1/1, no activation, 8x48x48 output
+// Layer 13: 16x48x48, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 48x48x48 output
+// Layer 14: 48x48x48, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 64x48x48 output
+// Layer 15: 64x48x48, no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 64x48x48 output
+// Layer 16: 64x48x48, no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 64x48x48 output
+// Layer 17: 64x48x48, no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, no activation, 64x48x48 output
+// Layer 18: 64x48x48, no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, no activation, 64x48x48 output
 
 #include <assert.h>
 #include <stdlib.h>
@@ -1429,8 +1430,8 @@ int cnn_enable(uint32_t clock_source, uint32_t clock_divider)
   MXC_GCFR->reg2 = 0x0; // Iso
   MXC_GCFR->reg3 = 0x0; // Reset
 
-  if (clock_source == MXC_S_GCR_PCLKDIV_CNNCLKSEL_ITO)
-    while ((MXC_GCR->ito_ctrl & MXC_F_GCR_ITO_CTRL_RDY) != MXC_F_GCR_ITO_CTRL_RDY) ; // Wait for PLL
+  if (clock_source == MXC_S_GCR_PCLKDIV_CNNCLKSEL_IPLL)
+    while ((MXC_GCR->ipll_ctrl & MXC_F_GCR_IPLL_CTRL_RDY) != MXC_F_GCR_IPLL_CTRL_RDY) ; // Wait for PLL
 
   MXC_GCR->pclkdiv = (MXC_GCR->pclkdiv & ~(MXC_F_GCR_PCLKDIV_CNNCLKDIV | MXC_F_GCR_PCLKDIV_CNNCLKSEL))
                      | clock_divider | clock_source;

@@ -1,4 +1,4 @@
-ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix kws20_v3_1 --checkpoint-file trained/ai87-kws20_v3-qat8-q.pth.tar --config-file networks/ai87-kws20-v3-hwc.yaml --softmax --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
+ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix kws20_v3_1 --checkpoint-file trained/ai87-kws20_v3-qat8-q.pth.tar --config-file networks/ai87-kws20-v3-hwc.yaml --softmax --overwrite --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
 MAX78002
 
 kws20_v3_1

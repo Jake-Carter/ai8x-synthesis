@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All rights Reserved.
+* Copyright (C) 2019-2022 Maxim Integrated Products, Inc., All rights Reserved.
 *
 * This software is protected by copyright laws of the United States and
 * of foreign countries. This material may also be protected by patent laws
@@ -33,7 +33,7 @@
 *******************************************************************************/
 
 // cats-dogs
-// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix cats-dogs --checkpoint-file trained/ai85-catsdogs-qat8-q.pth.tar --config-file networks/cats-dogs-chw.yaml --softmax --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
+// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix cats-dogs --checkpoint-file trained/ai85-catsdogs-qat8-q.pth.tar --config-file networks/cats-dogs-chw.yaml --softmax --overwrite --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
 
 #include <assert.h>
 #include <stdlib.h>
@@ -115,7 +115,7 @@ int main(void)
 
   // Switch to 100 MHz clock
   MXC_SYS_Clock_Select(MXC_SYS_CLOCK_IPO);
-  MXC_GCR->ito_ctrl |= MXC_F_GCR_ITO_CTRL_EN; // Enable PLL (ITO)
+  MXC_GCR->ipll_ctrl |= MXC_F_GCR_IPLL_CTRL_EN; // Enable IPLL
   SystemCoreClockUpdate();
 
   printf("Waiting...\n");
@@ -125,7 +125,7 @@ int main(void)
 
   // Enable peripheral, enable CNN interrupt, turn on CNN clock
   // CNN clock: 200 MHz div 1
-  cnn_enable(MXC_S_GCR_PCLKDIV_CNNCLKSEL_ITO, MXC_S_GCR_PCLKDIV_CNNCLKDIV_DIV1);
+  cnn_enable(MXC_S_GCR_PCLKDIV_CNNCLKSEL_IPLL, MXC_S_GCR_PCLKDIV_CNNCLKDIV_DIV1);
 
   printf("\n*** CNN Inference Test ***\n");
 
@@ -143,7 +143,7 @@ int main(void)
   // Switch CNN clock and disable PLL
   MXC_GCR->pclkdiv = (MXC_GCR->pclkdiv & ~(MXC_F_GCR_PCLKDIV_CNNCLKDIV | MXC_F_GCR_PCLKDIV_CNNCLKSEL))
                      | MXC_S_GCR_PCLKDIV_CNNCLKDIV_DIV1 | MXC_S_GCR_PCLKDIV_CNNCLKSEL_PCLK;
-  MXC_GCR->ito_ctrl &= ~MXC_F_GCR_ITO_CTRL_EN;
+  MXC_GCR->ipll_ctrl &= ~MXC_F_GCR_IPLL_CTRL_EN;
 
   if (check_output() != CNN_OK) fail();
   softmax_layer();

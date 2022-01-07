@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All rights Reserved.
+* Copyright (C) 2019-2022 Maxim Integrated Products, Inc., All rights Reserved.
 *
 * This software is protected by copyright laws of the United States and
 * of foreign countries. This material may also be protected by patent laws
@@ -33,28 +33,29 @@
 *******************************************************************************/
 
 // cifar-100-residual
-// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix cifar-100-residual --checkpoint-file trained/ai85-cifar100-residual-qat8-q.pth.tar --config-file networks/cifar100-ressimplenet.yaml --softmax --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
+// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix cifar-100-residual --checkpoint-file trained/ai85-cifar100-residual-qat8-q.pth.tar --config-file networks/cifar100-ressimplenet.yaml --softmax --overwrite --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
 
 // DO NOT EDIT - regenerate this file instead!
 
-// Configuring 17 layers:
-// Layer 0: 3x32x32 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 16x32x32 output
-// Layer 1: 16x32x32 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 20x32x32 output
-// Layer 2: 20x32x32 (HWC data), no pooling, no convolution, 20x32x32 output
-// Layer 3: 20x32x32 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 20x32x32 output
-// Layer 4: 2x20x32x32 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 20x32x32 output
-// Layer 5: 20x32x32 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 20x16x16 output
-// Layer 6: 20x16x16 (HWC data), no pooling, no convolution, 20x16x16 output
-// Layer 7: 20x16x16 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 20x16x16 output
-// Layer 8: 2x20x16x16 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 44x16x16 output
-// Layer 9: 44x16x16 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 48x8x8 output
-// Layer 10: 48x8x8 (HWC data), no pooling, no convolution, 48x8x8 output
-// Layer 11: 48x8x8 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 48x8x8 output
-// Layer 12: 2x48x8x8 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 96x4x4 output
-// Layer 13: 96x4x4 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 512x2x2 output
-// Layer 14: 512x2x2 (HWC data), no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 128x2x2 output
-// Layer 15: 128x2x2 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 128x1x1 output
-// Layer 16: 128x1x1 (HWC data), no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, no activation, 100x1x1 output
+// Configuring 17 layers
+// Input data: HWC
+// Layer 0: 3x32x32, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 16x32x32 output
+// Layer 1: 16x32x32, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 20x32x32 output
+// Layer 2: 20x32x32, no pooling, no convolution, 20x32x32 output
+// Layer 3: 20x32x32, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 20x32x32 output
+// Layer 4: 2x20x32x32, no pooling, 2-element add, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 20x32x32 output
+// Layer 5: 20x32x32, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 20x16x16 output
+// Layer 6: 20x16x16, no pooling, no convolution, 20x16x16 output
+// Layer 7: 20x16x16, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 20x16x16 output
+// Layer 8: 2x20x16x16, no pooling, 2-element add, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 44x16x16 output
+// Layer 9: 44x16x16, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 48x8x8 output
+// Layer 10: 48x8x8, no pooling, no convolution, 48x8x8 output
+// Layer 11: 48x8x8, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 48x8x8 output
+// Layer 12: 2x48x8x8, 2-element add, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 96x4x4 output
+// Layer 13: 96x4x4, max pool 2x2 with stride 2/2, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 512x2x2 output
+// Layer 14: 512x2x2, no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, ReLU, 128x2x2 output
+// Layer 15: 128x2x2, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 128x1x1 output
+// Layer 16: 128x1x1, no pooling, conv2d with kernel size 1x1, stride 1/1, pad 0/0, no activation, 100x1x1 output
 
 #include <assert.h>
 #include <stdlib.h>
@@ -1376,8 +1377,8 @@ int cnn_enable(uint32_t clock_source, uint32_t clock_divider)
   MXC_GCFR->reg2 = 0x0; // Iso
   MXC_GCFR->reg3 = 0x0; // Reset
 
-  if (clock_source == MXC_S_GCR_PCLKDIV_CNNCLKSEL_ITO)
-    while ((MXC_GCR->ito_ctrl & MXC_F_GCR_ITO_CTRL_RDY) != MXC_F_GCR_ITO_CTRL_RDY) ; // Wait for PLL
+  if (clock_source == MXC_S_GCR_PCLKDIV_CNNCLKSEL_IPLL)
+    while ((MXC_GCR->ipll_ctrl & MXC_F_GCR_IPLL_CTRL_RDY) != MXC_F_GCR_IPLL_CTRL_RDY) ; // Wait for PLL
 
   MXC_GCR->pclkdiv = (MXC_GCR->pclkdiv & ~(MXC_F_GCR_PCLKDIV_CNNCLKDIV | MXC_F_GCR_PCLKDIV_CNNCLKSEL))
                      | clock_divider | clock_source;

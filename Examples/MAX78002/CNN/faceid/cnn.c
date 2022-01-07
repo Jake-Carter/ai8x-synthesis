@@ -1,5 +1,5 @@
 /*******************************************************************************
-* Copyright (C) 2019-2021 Maxim Integrated Products, Inc., All rights Reserved.
+* Copyright (C) 2019-2022 Maxim Integrated Products, Inc., All rights Reserved.
 *
 * This software is protected by copyright laws of the United States and
 * of foreign countries. This material may also be protected by patent laws
@@ -33,20 +33,21 @@
 *******************************************************************************/
 
 // faceid
-// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix faceid --checkpoint-file trained/ai85-faceid-qat8-q.pth.tar --config-file networks/faceid.yaml --fifo --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
+// Created using ai8xize.py --test-dir sdk/Examples/MAX78002/CNN --prefix faceid --checkpoint-file trained/ai85-faceid-qat8-q.pth.tar --config-file networks/faceid.yaml --fifo --overwrite --device MAX78002 --compact-data --mexpress --timer 0 --display-checkpoint --verbose
 
 // DO NOT EDIT - regenerate this file instead!
 
-// Configuring 9 layers:
-// Layer 0: 3x160x120 (streaming HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 16x160x120 output
-// Layer 1: 16x160x120 (streaming HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 32x80x60 output
-// Layer 2: 32x80x60 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 32x40x30 output
-// Layer 3: 32x40x30 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 64x20x15 output
-// Layer 4: 64x20x15 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 64x10x7 output
-// Layer 5: 64x10x7 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 64x10x7 output
-// Layer 6: 64x10x7 (HWC data), no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 64x10x7 output
-// Layer 7: 64x10x7 (HWC data), max pool 2x2 with stride 2/2, conv2d with kernel size 1x1, stride 1/1, pad 0/0, no activation, 512x5x3 output
-// Layer 8: 512x5x3 (HWC data), avg pool 5x3 with stride 1/1, no convolution, 512x1x1 output
+// Configuring 9 layers
+// Input data: HWC
+// Layer 0: 3x160x120streaming , no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 16x160x120 output
+// Layer 1: 16x160x120streaming , max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 32x80x60 output
+// Layer 2: 32x80x60, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 32x40x30 output
+// Layer 3: 32x40x30, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 64x20x15 output
+// Layer 4: 64x20x15, max pool 2x2 with stride 2/2, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 64x10x7 output
+// Layer 5: 64x10x7, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 64x10x7 output
+// Layer 6: 64x10x7, no pooling, conv2d with kernel size 3x3, stride 1/1, pad 1/1, ReLU, 64x10x7 output
+// Layer 7: 64x10x7, max pool 2x2 with stride 2/2, conv2d with kernel size 1x1, stride 1/1, pad 0/0, no activation, 512x5x3 output
+// Layer 8: 512x5x3, avg pool 5x3 with stride 1/1, no convolution, 512x1x1 output
 
 #include <assert.h>
 #include <stdlib.h>
@@ -1080,8 +1081,8 @@ int cnn_enable(uint32_t clock_source, uint32_t clock_divider)
   MXC_GCFR->reg2 = 0x0; // Iso
   MXC_GCFR->reg3 = 0x0; // Reset
 
-  if (clock_source == MXC_S_GCR_PCLKDIV_CNNCLKSEL_ITO)
-    while ((MXC_GCR->ito_ctrl & MXC_F_GCR_ITO_CTRL_RDY) != MXC_F_GCR_ITO_CTRL_RDY) ; // Wait for PLL
+  if (clock_source == MXC_S_GCR_PCLKDIV_CNNCLKSEL_IPLL)
+    while ((MXC_GCR->ipll_ctrl & MXC_F_GCR_IPLL_CTRL_RDY) != MXC_F_GCR_IPLL_CTRL_RDY) ; // Wait for PLL
 
   MXC_GCR->pclkdiv = (MXC_GCR->pclkdiv & ~(MXC_F_GCR_PCLKDIV_CNNCLKDIV | MXC_F_GCR_PCLKDIV_CNNCLKSEL))
                      | clock_divider | clock_source;
