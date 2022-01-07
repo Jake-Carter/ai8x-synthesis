@@ -32,13 +32,7 @@
  #
  ###############################################################################
 
-# Command-line option for overriding output filename.  
-# Ex: make all OUTFILE="filename" ... results in filename.elf
-ifneq "$(OUTFILE)" ""
-PROJECT=$(OUTFILE)
-endif
-
-# Default name of the build output file
+# This is the name of the build output file
 ifeq "$(PROJECT)" ""
 PROJECT=kws20_v3_1
 endif
